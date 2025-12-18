@@ -30,7 +30,7 @@ class AgentService {
       userId,                                                 // 用户ID
       currentStep: 'init',                                    // 当前步骤
       options: extraInfo || ['选项A', '选项B', '选项C']  // 可选项列表
-    };
+    } as WorkflowState;
 
     // 将用户消息添加到对话历史中
     state.messages.push({ role: 'user', content: message });
