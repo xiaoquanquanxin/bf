@@ -6,7 +6,7 @@ import chatRouter from './routers/chatRouter';
 // 创建 Express 应用实例
 const app = express();
 // 定义服务器端口号
-const PORT = 8001;
+const PORT = 8000;
 
 // 配置中间件：解析 JSON 请求体
 app.use(express.json());
