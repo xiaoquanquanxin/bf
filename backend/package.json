@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "dotenv": "17.2.3",
-    "express": "4.18.2",
+    "express": "4.21.1",
     "openai": "4.20.1",
     "uuid": "9.0.1"
   },
