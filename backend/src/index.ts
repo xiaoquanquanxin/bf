@@ -1,11 +1,11 @@
 import 'dotenv/config';
 import express from 'express';
-import {v4 as uuidv4} from 'uuid';
-import {agent} from './services/agent';
+import { chatRouter } from './routers/chatRouter';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// 中间件
 app.use(express.json());
 
 // CORS
@@ -19,23 +19,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// 聊天接口
-app.post('/api/chat', async (req, res) => {
-  const {message, userId, conversationId} = req.body;
+// 路由注册
+app.use('/api', chatRouter);
 
-  try {
-    const response = await agent.processMessage(message, userId);
-
-    res.json({
-      message: response,
-      conversationId: conversationId || uuidv4()
-    });
-  } catch (error) {
-    console.error('聊天错误:', error);
-    res.status(500).json({error: '服务器错误'});
-  }
-});
-
+// 启动服务器
 app.listen(PORT, () => {
   console.log(`✅ 服务器启动: http://localhost:${PORT}`);
+  console.log(`📡 聊天接口: http://localhost:${PORT}/api/chat`);
 });

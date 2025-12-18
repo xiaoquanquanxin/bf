@@ -1,8 +1,41 @@
 import { llmClient } from './llmClient';
-import { tools } from './workflow/tools';
 import { createBasicGeometry, createComponent } from '../tools';
 
-export class Agent {
+// 工具定义
+const tools = [
+  {
+    type: 'function',
+    function: {
+      name: 'create_geometry',
+      description: '创建3D几何体',
+      parameters: {
+        type: 'object',
+        properties: {
+          type: { type: 'string', description: '几何体类型' },
+          dimensions: { type: 'object', description: '尺寸参数' }
+        },
+        required: ['type', 'dimensions']
+      }
+    }
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'create_component',
+      description: '创建电路元件',
+      parameters: {
+        type: 'object',
+        properties: {
+          type: { type: 'string', description: '元件类型' },
+          properties: { type: 'object', description: '元件属性' }
+        },
+        required: ['type', 'properties']
+      }
+    }
+  }
+];
+
+class Agent {
   private systemPrompt = '你是一个3D建模和电气设计助手，可以帮助用户创建几何体和电路元件。';
 
   async processMessage(message: string, userId: string): Promise<string> {
@@ -13,7 +46,6 @@ export class Agent {
 
     const llmResponse = await llmClient.chat(messages, tools);
 
-    // 处理工具调用
     if (llmResponse.tool_calls && llmResponse.tool_calls.length > 0) {
       const toolCall = llmResponse.tool_calls[0];
       const toolName = toolCall.function.name;
