@@ -1,93 +1,33 @@
-# Chatbot TypeScript Backend
+# 聊天应用后端
 
-基于 TypeScript + Node.js + Express 的聊天机器人后端，参考 Python chatbot_app 架构。
+## 环境配置
 
-## 功能特性
-
-- ✅ 流式响应（SSE）
-- ✅ LLM 集成（通义千问）
-- ✅ 工具调用（Tool Calling）
-- ✅ 多轮对话管理
-- ✅ 前端操作指令生成
-
-## 项目结构
-
+1. 复制环境变量文件：
+```bash
+cp .env.example .env
 ```
-chatbot-ts/
-├── src/
-│   ├── models/
-│   │   └── types.ts           # 数据类型定义
-│   ├── routers/
-│   │   └── chatRouter.ts      # 路由处理
-│   ├── services/
-│   │   ├── agentService.ts    # Agent 服务层
-│   │   ├── llmClient.ts       # LLM 客户端
-│   │   └── workflow/
-│   │       ├── tools.ts       # 工具定义
-│   │       └── prompts.ts     # Prompt 模板
-│   └── index.ts               # 入口文件
-├── package.json
-└── tsconfig.json
+
+2. 编辑 `.env` 文件，填入你的配置：
+```
+API_KEY=your_api_key_here
+BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+MODEL_NAME=qwen-plus
+PORT=8000
 ```
 
 ## 安装依赖
 
 ```bash
-yarn install
+npm install
 ```
 
-## 运行
+## 运行项目
 
-开发模式（热重载）：
 ```bash
-yarn dev
+npm run dev
 ```
 
-构建：
-```bash
-yarn build
-```
+## 注意事项
 
-生产模式：
-```bash
-yarn start
-```
-
-## API 端点
-
-### POST /api/chat/chat
-
-请求体：
-```json
-{
-  "message": "开始任务",
-  "userId": "1",
-  "conversationId": "optional-uuid",
-  "stream": true,
-  "extraInfo": ["选项A", "选项B", "选项C"]
-}
-```
-
-响应（SSE）：
-```
-data: {"type":"start","message_id":"...","conversation_id":"..."}
-
-data: {"mainMessage":"好的！请选择一个选项：","frontend_actions":[...]}
-
-data: {"type":"end","timestamp":"...","conversation_id":"..."}
-```
-
-## 业务逻辑
-
-简化的任务选择流程：
-1. 用户发起任务
-2. 选择选项
-3. 确认执行
-4. 完成任务
-
-## 技术栈
-
-- TypeScript
-- Node.js + Express
-- OpenAI SDK（兼容通义千问）
-- UUID
+- 请勿将 `.env` 文件提交到版本控制系统
+- 确保 API_KEY 有效且有足够的配额
