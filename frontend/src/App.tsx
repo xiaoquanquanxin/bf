@@ -26,7 +26,9 @@ function App() {
 
   return (
     <div className="app">
-      <div className="left">黄色自适应</div>
+      <div className="left">
+        <Scene3D onExecuteTask={(option) => console.log('执行任务:', option)} />
+      </div>
       <div className="right">
         <ChatPanel onFrontendAction={handleFrontendAction} />
       </div>
