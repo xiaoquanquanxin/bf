@@ -1,0 +1,77 @@
+* 重点是设计 tool，尽全力分行为、场景、颗粒化；
+* 早期只有基础 tool，未来频繁固定顺序使用的会抽成上层 tool
+* 未来 tool 太多了的情况下，根据工作流，就是当前在做什么，来动态加载 tool。超过 200 个，就需要考虑分层或动态加载了。
+```ts
+// LLM 不是看完整的 1000 个 Tool
+// 而是根据上下文，只看相关的
+
+const agent = createAgent({
+  model,
+  tools: getRelevantTools(userContext)
+  // ↑ 根据用户当前的操作，只加载相关的 Tools
+});
+
+function getRelevantTools(context) {
+  if (context.currentMode === "building") {
+    return [addCircle, addRectangle, moveObject, ...];  // 20 个
+  }
+  
+  if (context.currentMode === "painting") {
+    return [modifyProperties, colorObject, ...];  // 15 个
+  }
+  
+  // 每个时刻 LLM 只看 20 个 Tools，不是 1000 个
+}
+```
+```ts
+// 用户："我想改颜色"
+// ↓
+// LLM 通过"Tool 搜索"找到相关的
+// 只有 5-10 个 Tools 被加载
+
+const tools = [
+  {
+    name: "colorObject",
+    group: "styling",  // ← 分组
+    keywords: ["color", "paint", "styling"]
+  },
+  {
+    name: "changeTexture",
+    group: "styling",
+    keywords: ["texture", "material", "surface"]
+  },
+  // ...
+];
+
+// LLM 看到用户说"改颜色"
+// 搜索 group="styling" 的 Tools
+// 只需要看 10 个，不是 1000 个
+```
+
+### 什么时候才真的需要多个 Agent？
+* 不是因为 Tools 太多，而是因为业务逻辑真的分离：
+
+✅ 需要多个 Agent 的场景：
+- Agent A 处理"用户请求"
+- Agent B 处理"系统后台任务"
+- 它们的职责、流程、模型完全不同
+- 不是"都在同一个对话里"
+
+✅ 另一个场景：
+- 多个独立的产品线
+- 各自有各自的 Agent
+- 它们不交互
+
+❌ 不需要多个 Agent 的场景：
+- 只是因为 Tools 太多
+- 只是想"分组"
+- 都在同一个用户对话里
+
+
+### 为什么主 + 多个子 agent？
+* 聚焦功能点 - 每个 Agent 职责明确
+* 准确率高 - LLM 看的 Tools 少，决策准
+* 易维护 - 出问题时快速定位
+* 易扩展 - 新功能新建 Agent，不会越来越混乱
+* 可优化 - 每个 Agent 可以独立优化 Prompt、模型
+* 代价就是要写协调代码，但这是值得的。
