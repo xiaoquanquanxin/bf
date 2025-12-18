@@ -1,34 +1,41 @@
-// 加载环境变量配置
 import 'dotenv/config';
-// 导入 Express 框架
 import express from 'express';
-// 导入聊天路由模块
-import chatRouter from './routers/chatRouter';
+import {v4 as uuidv4} from 'uuid';
+import {agent} from './services/agent';
 
-// 创建 Express 应用实例
 const app = express();
-// 从环境变量获取端口号，默认为 8000
 const PORT = process.env.PORT || 8000;
 
-// 配置中间件：解析 JSON 请求体
 app.use(express.json());
 
-// 配置 CORS 跨域中间件
+// CORS
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');                    // 允许所有域名访问
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // 允许的 HTTP 方法
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');     // 允许的请求头
-  if (req.method === 'OPTIONS') {                                   // 处理预检请求
-    return res.sendStatus(200);                                     // 返回 200 状态码
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
   }
-  next();                                                           // 继续执行下一个中间件
+  next();
 });
 
-// 注册聊天相关的路由，所有 /api/chat 开头的请求都会被 chatRouter 处理
-app.use('/api/chat', chatRouter);
+// 聊天接口
+app.post('/api/chat', async (req, res) => {
+  const {message, userId, conversationId} = req.body;
 
-// 启动服务器并监听指定端口
+  try {
+    const response = await agent.processMessage(message, userId);
+
+    res.json({
+      message: response,
+      conversationId: conversationId || uuidv4()
+    });
+  } catch (error) {
+    console.error('聊天错误:', error);
+    res.status(500).json({error: '服务器错误'});
+  }
+});
+
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);        // 输出服务器启动信息
-  console.log(`📡 Chat endpoint: http://localhost:${PORT}/api/chat/chat`); // 输出聊天接口地址
+  console.log(`✅ 服务器启动: http://localhost:${PORT}`);
 });
