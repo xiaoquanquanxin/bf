@@ -9,8 +9,8 @@ export class LLMClient {
   // 构造函数：初始化 OpenAI 客户端
   constructor() {
     this.client = new OpenAI({
-      apiKey: 'sk-55e61114ffd14836964dfd1d16666dd5',                    // API 密钥
-      baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',    // 阿里云灵积的 API 基础地址
+      apiKey: process.env.API_KEY || '',                              // 从环境变量获取 API 密钥
+      baseURL: process.env.BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1', // 从环境变量获取 API 基础地址
     });
   }
 
@@ -18,7 +18,7 @@ export class LLMClient {
   async chat(messages: Array<{ role: string; content: string }>, tools?: any[]): Promise<any> {
     // 构建请求参数
     const params: any = {
-      model: 'qwen-plus',        // 使用的模型名称（通义千问 Plus）
+      model: process.env.MODEL_NAME || 'qwen-plus', // 从环境变量获取模型名称
       messages,                 // 消息列表
       temperature: 0.1,         // 温度参数，控制响应的随机性（较低值表示更稳定）
     };
