@@ -92,10 +92,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onFrontendAction }) => {
   return (
     <Card
       title={<><RobotOutlined /> 3D 建模助手</>}
-      style={{ width: 400, height: '100%', display: 'flex', flexDirection: 'column' }}
       bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 0 }}
     >
-      <div style={{
+      <div className="messages-area" style={{
         flex: 1,
         overflowY: 'auto',
         padding: '16px',

@@ -27,7 +27,7 @@ function RotatingCube() {
 
 export const Scene3D: React.FC<Scene3DProps> = ({ onExecuteTask }) => {
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div>
       <Canvas camera={{ position: [5, 5, 5], fov: 60 }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />

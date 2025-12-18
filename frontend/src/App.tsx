@@ -4,6 +4,7 @@ import { Scene3D } from './components/Scene3D';
 import { ChatPanel } from './components/ChatPanel';
 import { FrontendAction } from './types';
 import 'antd/dist/reset.css';
+import './App.css';
 
 function App() {
   const handleFrontendAction = (action: FrontendAction) => {
@@ -24,19 +25,12 @@ function App() {
   };
 
   return (
-    <ConfigProvider>
-      <div style={{
-        width: '100vw',
-        height: '100vh',
-        display: 'flex',
-        backgroundColor: '#f0f2f5'
-      }}>
-        <div style={{ flex: 1, height: '100%' }}>
-          <Scene3D onExecuteTask={(option) => console.log('执行任务:', option)} />
-        </div>
+    <div className="app">
+      <div className="left">黄色自适应</div>
+      <div className="right">
         <ChatPanel onFrontendAction={handleFrontendAction} />
       </div>
-    </ConfigProvider>
+    </div>
   );
 }
 
