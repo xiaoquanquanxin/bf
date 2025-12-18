@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "TypeScript chatbot backend with LLM",
   "main": "dist/index.js",
+  "packageManager": "yarn@1.22.19",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
