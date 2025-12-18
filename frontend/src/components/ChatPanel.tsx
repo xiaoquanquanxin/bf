@@ -90,127 +90,90 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onFrontendAction }) => {
   };
 
   return (
-    <div style={{
-      width: '400px',
-      height: '100%',
-      backgroundColor: '#2a2a2a',
-      display: 'flex',
-      flexDirection: 'column',
-      borderLeft: '1px solid #444'
-    }}>
-      <div style={{
-        padding: '20px',
-        borderBottom: '1px solid #444',
-        backgroundColor: '#333'
-      }}>
-        <h2 style={{ margin: 0, color: 'white', fontSize: '18px' }}>3D 建模助手</h2>
-      </div>
-
+    <Card
+      title={<><RobotOutlined /> 3D 建模助手</>}
+      style={{ width: 400, height: '100%', display: 'flex', flexDirection: 'column' }}
+      bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 0 }}
+    >
       <div style={{
         flex: 1,
         overflowY: 'auto',
-        padding: '20px',
+        padding: '16px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '15px'
+        gap: '12px'
       }}>
         {messages.map((message, index) => (
           <div
             key={index}
             style={{
-              padding: '12px',
-              borderRadius: '8px',
-              backgroundColor: message.role === 'user' ? '#0066cc' : '#444',
-              color: 'white',
-              alignSelf: message.role === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: '80%',
-              wordWrap: 'break-word'
+              display: 'flex',
+              justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start'
             }}
           >
-            {message.content}
+            <Card
+              size="small"
+              style={{
+                maxWidth: '80%',
+                backgroundColor: message.role === 'user' ? '#1890ff' : '#f5f5f5'
+              }}
+              bodyStyle={{ padding: '8px 12px' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {message.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
+                <span>{message.content}</span>
+              </div>
+            </Card>
           </div>
         ))}
 
         {options.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <Space direction="vertical" size="small">
             {options.map((option, index) => (
-              <button
+              <Button
                 key={index}
                 onClick={() => handleOptionClick(option)}
-                style={{
-                  padding: '10px',
-                  borderRadius: '6px',
-                  border: '1px solid #666',
-                  backgroundColor: '#555',
-                  color: 'white',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#666'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#555'}
+                block
+                type="dashed"
               >
                 {option}
-              </button>
+              </Button>
             ))}
-          </div>
+          </Space>
         )}
 
         {isLoading && (
-          <div style={{
-            padding: '12px',
-            borderRadius: '8px',
-            backgroundColor: '#444',
-            color: '#ccc',
-            alignSelf: 'flex-start',
-            maxWidth: '80%'
-          }}>
-            正在处理...
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <Card size="small" style={{ backgroundColor: '#f5f5f5' }}>
+              <Spin size="small" /> 正在处理...
+            </Card>
           </div>
         )}
 
         <div ref={messagesEndRef} />
       </div>
 
-      <div style={{
-        padding: '20px',
-        borderTop: '1px solid #444',
-        backgroundColor: '#333'
-      }}>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <input
-            type="text"
+      <div style={{ padding: '16px', borderTop: '1px solid #f0f0f0' }}>
+        <Input.Group compact>
+          <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(input)}
+            onPressEnter={() => handleSendMessage(input)}
             placeholder="输入消息..."
             disabled={isLoading}
-            style={{
-              flex: 1,
-              padding: '10px',
-              borderRadius: '6px',
-              border: '1px solid #666',
-              backgroundColor: '#555',
-              color: 'white',
-              outline: 'none'
-            }}
+            style={{ width: 'calc(100% - 80px)' }}
           />
-          <button
+          <Button
+            type="primary"
+            icon={<SendOutlined />}
             onClick={() => handleSendMessage(input)}
             disabled={isLoading || !input.trim()}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '6px',
-              border: 'none',
-              backgroundColor: '#0066cc',
-              color: 'white',
-              cursor: isLoading || !input.trim() ? 'not-allowed' : 'pointer',
-              opacity: isLoading || !input.trim() ? 0.5 : 1
-            }}
+            style={{ width: '80px' }}
           >
             发送
-          </button>
-        </div>
+          </Button>
+        </Input.Group>
       </div>
-    </div>
+    </Card>
   );
 };

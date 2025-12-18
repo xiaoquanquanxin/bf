@@ -1,7 +1,9 @@
 import React from 'react';
+import { ConfigProvider } from 'antd';
 import { Scene3D } from './components/Scene3D';
 import { ChatPanel } from './components/ChatPanel';
 import { FrontendAction } from './types';
+import 'antd/dist/reset.css';
 
 function App() {
   const handleFrontendAction = (action: FrontendAction) => {
@@ -22,17 +24,19 @@ function App() {
   };
 
   return (
-    <div style={{
-      width: '100vw',
-      height: '100vh',
-      display: 'flex',
-      backgroundColor: '#1a1a1a'
-    }}>
-      <div style={{ flex: 1, height: '100%' }}>
-        <Scene3D onExecuteTask={(option) => console.log('执行任务:', option)} />
+    <ConfigProvider>
+      <div style={{
+        width: '100vw',
+        height: '100vh',
+        display: 'flex',
+        backgroundColor: '#f0f2f5'
+      }}>
+        <div style={{ flex: 1, height: '100%' }}>
+          <Scene3D onExecuteTask={(option) => console.log('执行任务:', option)} />
+        </div>
+        <ChatPanel onFrontendAction={handleFrontendAction} />
       </div>
-      <ChatPanel onFrontendAction={handleFrontendAction} />
-    </div>
+    </ConfigProvider>
   );
 }
 
