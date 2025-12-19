@@ -1,7 +1,9 @@
+import {ToolResult} from "../../types";
 // 导入 LangChain 工具创建函数
 import {tool} from "langchain";
 // 导入 THREE.js 的 Vector3 类型
 import {Vector3} from "three";
+import {generateUUID} from 'three/src/math/MathUtils'
 // 导入顶点工具
 import {VertexUtils} from "../../utils";
 // 导入画线工具的参数验证模式
@@ -9,12 +11,18 @@ import {drawLineSchema} from "../../schemas";
 // 导入 Zod 类型推断工具
 import {z} from "zod";
 
+
+// 对应线段的返回
+type LineResult = ToolResult<{
+  startPoint: { x: number; y: number; z: number };
+  endPoint: { x: number; y: number; z: number };
+  length: number;
+}>;
+
+
 // 创建画线工具
 const drawLineTool = tool(
-  (params: z.infer<typeof drawLineSchema>) => {
-    // 调试输出
-    console.log('drawLineTool - params:', params);
-
+  (params: z.infer<typeof drawLineSchema>): LineResult => {
     // 声明起点变量
     let startPoint: Vector3;
     // 声明终点变量
@@ -45,7 +53,17 @@ const drawLineTool = tool(
     // 执行确认输出
     console.log("执行工具-drawLineTool");
     // 返回执行结果
-    return `已成功画线：从 (${startPoint.x.toFixed(2)}, ${startPoint.y.toFixed(2)}, ${startPoint.z.toFixed(2)}) 到 (${endPoint.x.toFixed(2)}, ${endPoint.y.toFixed(2)}, ${endPoint.z.toFixed(2)})，长度为 ${length.toFixed(2)} 单位`;
+    return {
+      id: generateUUID(),
+      timestamp: Date.now(),
+      message: `已成功画线：从 (${startPoint.x.toFixed(2)}, ${startPoint.y.toFixed(2)}, ${startPoint.z.toFixed(2)}) 到 (${endPoint.x.toFixed(2)}, ${endPoint.y.toFixed(2)}, ${endPoint.z.toFixed(2)})，长度为 ${length.toFixed(2)} 单位`,
+      success: true,
+      data: {
+        startPoint,
+        endPoint,
+        length,
+      },
+    }
   },
   {
     // 工具名称
