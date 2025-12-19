@@ -19,7 +19,7 @@ router.post('/chat', async (req, res) => {
 
     // 返回响应结果
     res.json({
-      message: response,
+      ...response,
       conversationId: conversationId || uuidv4()
     });
   } catch (error) {
