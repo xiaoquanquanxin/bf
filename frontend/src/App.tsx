@@ -1,15 +1,14 @@
+import {FrontendAction} from './types';
 import React from 'react';
-import { ConfigProvider } from 'antd';
-import { Scene3D } from './components/Scene3D';
-import { ChatPanel } from './components/ChatPanel';
-import { FrontendAction } from './types';
+import {Scene3D} from './components/Scene3D';
+import {ChatPanel} from './components/ChatPanel';
 import 'antd/dist/reset.css';
 import './App.css';
 
 function App() {
   const handleFrontendAction = (action: FrontendAction) => {
     console.log('前端操作:', action);
-    
+
     switch (action.method) {
       case 'executeTask':
         console.log('执行任务:', action.params.option);
@@ -27,10 +26,10 @@ function App() {
   return (
     <div className="app">
       <div className="left">
-        <Scene3D onExecuteTask={(option) => console.log('执行任务:', option)} />
+        <Scene3D onExecuteTask={(option) => console.log('执行任务:', option)}/>
       </div>
       <div className="right">
-        <ChatPanel onFrontendAction={handleFrontendAction} />
+        <ChatPanel onFrontendAction={handleFrontendAction}/>
       </div>
     </div>
   );
