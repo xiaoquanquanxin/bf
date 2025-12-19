@@ -1,0 +1,51 @@
+{
+  "name": "mychatapp",
+  "version": "1.0.0",
+  "description": "3D建模聊天应用 - 前后端一体化项目",
+  "private": true,
+  "packageManager": "yarn@1.22.19",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && vite",
+    "dev:backend": "cd backend && tsx watch src/index.ts",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && tsc && vite build",
+    "build:backend": "cd backend && tsc",
+    "start": "cd backend && node dist/index.js",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\" --ignore-path .prettierignore"
+  },
+  "dependencies": {
+    "@ant-design/icons": "5.2.6",
+    "@langchain/langgraph-sdk": "^1.3.1",
+    "@react-three/drei": "9.88.13",
+    "@react-three/fiber": "8.15.12",
+    "antd": "5.12.8",
+    "dotenv": "17.2.3",
+    "express": "4.21.1",
+    "openai": "4.20.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "three": "0.158.0",
+    "uuid": "9.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "4.17.21",
+    "@types/node": "20.10.0",
+    "@types/react": "18.2.45",
+    "@types/react-dom": "18.2.18",
+    "@types/three": "0.158.3",
+    "@types/uuid": "9.0.7",
+    "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^8.2.2",
+    "prettier": "^3.7.4",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "tsx": "4.7.0",
+    "typescript": "5.3.3",
+    "vite": "^5.0.8"
+  }
+}
