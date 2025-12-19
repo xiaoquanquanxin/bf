@@ -5,6 +5,11 @@ import {ChatOpenAI} from '@langchain/openai';
 import {createAgent} from 'langchain';
 // 导入画线工具
 import {drawLineTool} from "../tools";
+import {MemorySaver} from "@langchain/langgraph";
+
+
+// 创建内存检查点
+const checkpointer = new MemorySaver();
 
 // 基于 LangChain 的 Agent 客户端
 export class AgentClient {
@@ -34,7 +39,8 @@ export class AgentClient {
       // 可用工具列表
       tools: [drawLineTool],
       // 系统提示词
-      systemPrompt: '你是一个3D建模和电气设计助手，可以帮助用户创建几何体和电路元件。'
+      systemPrompt: '你是一个3D建模和电气设计助手，可以帮助用户创建几何体和电路元件。',
+      checkpointer,
     });
   }
 
@@ -43,8 +49,9 @@ export class AgentClient {
     // 调试输出：分析前
     // console.log('分析之前')
     // console.log(messages)
+    const config = {configurable: {thread_id: "user_123"}};
     // 调用 Agent 处理消息
-    const result = await this.agent.invoke({messages}) as AgentResult;
+    const result = await this.agent.invoke({messages}, config) as AgentResult;
     // 调试输出：分析后
     console.log('分析之后');
     // console.log(result.messages);
