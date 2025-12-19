@@ -1,3 +1,5 @@
+import {BaseMessage} from "@langchain/core/messages";
+
 // 服务端统一返回这个格式
 type ToolResult<T> = {
   success: boolean;
@@ -7,4 +9,10 @@ type ToolResult<T> = {
   timestamp: number;
 };
 
-export {ToolResult}
+// 定义 Agent 返回结果的类型
+interface AgentResult {
+  messages: BaseMessage[];
+  // 如果还有其他字段，继续添加
+}
+
+export {ToolResult, AgentResult}
