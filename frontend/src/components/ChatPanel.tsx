@@ -104,7 +104,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
             >
               <div>
                 <div style={{fontSize: '11px', color: '#999', textAlign: message.role === 'user' ? 'right' : 'left', marginBottom: '4px'}}>
-                  {message.timestamp.toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})}
+                  {message.timestamp.toLocaleString('zh-CN', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'})}
                 </div>
                 <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                   {message.role === 'user' ? 
