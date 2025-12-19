@@ -3,7 +3,7 @@ import {Router} from 'express';
 // 导入 UUID 生成器
 import {v4 as uuidv4} from 'uuid';
 // 导入 Agent 服务
-import {agent} from '../services/agent';
+import {agentClient} from "../services/llmClient";
 
 // 创建路由器实例
 const router = Router();
@@ -14,8 +14,13 @@ router.post('/chat', async (req, res) => {
   const {message, userId, conversationId} = req.body;
 
   try {
+    // 构建消息数组
+    const messages = [
+      {role: 'user', content: message, userId}
+    ];
+
     // 调用 Agent 处理消息
-    const response = await agent.processMessage(message, userId);
+    const response = await agentClient.processMessage(messages);
 
     // 返回响应结果
     res.json({
