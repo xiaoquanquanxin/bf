@@ -42,6 +42,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
 
     try {
       const response = await chatService.sendMessage(messageText, userId, conversationId)
+      console.log(response.drawnObjects)
       const assistantMessage: ChatMessage = {
         role: 'assistant',
         content: response.aiMessage,
