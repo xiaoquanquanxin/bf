@@ -12,7 +12,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onFrontendAction }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationId, setConversationId] = useState<string>();
+  const [conversationId, setConversationId] = useState<string>('');
   const [options, setOptions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -40,36 +40,17 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onFrontendAction }) => {
     setIsLoading(true);
 
     try {
-      const newConversationId = await chatService.sendMessage(
-        messageText,
-        userId,
-        conversationId,
-        (response) => {
-          const assistantMessage: ChatMessage = {
-            role: 'assistant',
-            content: response.mainMessage,
-            timestamp: new Date()
-          };
-          setMessages(prev => [...prev, assistantMessage]);
+      const response = await chatService.sendMessage(messageText, userId, conversationId);
 
-          if (response.frontend_actions) {
-            response.frontend_actions.forEach(action => {
-              if (action.method === 'showOptions') {
-                setOptions(action.params.options || []);
-              }
-              onFrontendAction?.(action);
-            });
-          }
-        },
-        (event) => {
-          if (event.type === 'start' && event.conversation_id) {
-            setConversationId(event.conversation_id);
-          }
-        }
-      );
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: response.message,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, assistantMessage]);
 
-      if (newConversationId) {
-        setConversationId(newConversationId);
+      if (response.conversationId) {
+        setConversationId(response.conversationId);
       }
     } catch (error) {
       console.error('发送消息失败:', error);
