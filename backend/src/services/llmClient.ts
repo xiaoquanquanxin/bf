@@ -15,7 +15,7 @@ export class LLMClient {
   }
 
   // 聊天方法：发送消息给 LLM 并获取响应
-  async chat(messages: Array<{ role: string; content: string }>, tools?: any[]): Promise<any> {
+  async chat(messages: Array<{ role: string; content: string }>, tools: any[]): Promise<any> {
     // 构建请求参数
     const params: any = {
       model: process.env.MODEL_NAME!, // 从环境变量获取模型名称
@@ -24,7 +24,7 @@ export class LLMClient {
     };
 
     // 如果提供了工具，则启用函数调用功能
-    if (tools && tools.length > 0) {
+    if (tools.length > 0) {
       params.tools = tools;           // 可用工具列表
       params.tool_choice = 'auto';    // 自动选择是否使用工具
     }
