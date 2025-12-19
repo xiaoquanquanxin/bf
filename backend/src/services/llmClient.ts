@@ -24,11 +24,12 @@ export class AgentClient {
   }
 
   async processMessage(messages: Array<{ role: string; content: string }>): Promise<string> {
-    console.log('before invoke')
+    console.log('分析之前')
     console.log(messages)
     const result = await this.agent.invoke({messages});
-    console.log('after invoke')
+    console.log('分析之后')
     const lastMessage = result.messages[result.messages.length - 1];
+    console.log('服务端输出', lastMessage.content)
     return lastMessage.content;
   }
 }
