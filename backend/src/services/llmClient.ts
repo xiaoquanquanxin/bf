@@ -24,7 +24,10 @@ export class AgentClient {
   }
 
   async processMessage(messages: Array<{ role: string; content: string }>): Promise<string> {
+    console.log('before invoke')
+    console.log(messages)
     const result = await this.agent.invoke({messages});
+    console.log('after invoke')
     const lastMessage = result.messages[result.messages.length - 1];
     return lastMessage.content;
   }
