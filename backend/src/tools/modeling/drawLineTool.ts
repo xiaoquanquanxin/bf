@@ -51,7 +51,7 @@ const drawLineTool = tool(
     }
 
     // 执行确认输出
-    console.log("执行工具-drawLineTool");
+    // console.log("执行工具-drawLineTool");
     // 返回执行结果
     return {
       id: generateUUID(),

@@ -1,3 +1,4 @@
+import {AgentResult, ToolResult} from "../types";
 // 导入 OpenAI 聊天模型
 import {ChatOpenAI} from '@langchain/openai';
 // 导入 LangChain Agent 创建函数
@@ -38,20 +39,33 @@ export class AgentClient {
   }
 
   // 处理消息方法
-  async processMessage(messages: Array<{ role: string; content: string }>): Promise<string> {
+  async processMessage(messages: Array<{ role: string; content: string }>): Promise<AgentResult> {
     // 调试输出：分析前
-    console.log('分析之前')
-    console.log(messages)
+    // console.log('分析之前')
+    // console.log(messages)
     // 调用 Agent 处理消息
-    const result = await this.agent.invoke({messages});
+    const result = await this.agent.invoke({messages}) as AgentResult;
     // 调试输出：分析后
-    console.log('分析之后')
-    // 获取最后一条消息
-    const lastMessage = result.messages[result.messages.length - 1];
-    // 调试输出：服务端结果
-    console.log('服务端输出', lastMessage.content)
+    console.log('分析之后');
+    // console.log(result.messages);
+
+    const drawnObjects: Array<ToolResult> = [];
+    for (const msg of result.messages) {
+      // ToolMessage 包含实际的 tool 执行结果
+      if (msg.type === 'tool') {
+        try {
+          drawnObjects.push(JSON.parse(msg.content))
+        } catch (e) {
+          console.error('解析 tool 结果失败:', e);
+        }
+      }
+    }
+
     // 返回消息内容
-    return lastMessage.content;
+    return {
+      aiMessage: result.messages[result.messages.length - 1].content,
+      drawnObjects,
+    };
   }
 }
 
