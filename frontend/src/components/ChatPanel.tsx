@@ -1,14 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Input, Button, Card, Space, Tag, Spin } from 'antd';
-import { SendOutlined, RobotOutlined, UserOutlined } from '@ant-design/icons';
-import { ChatMessage, FrontendAction } from '../types';
-import { chatService } from '../services/chatService';
+import {ChatMessage, FrontendAction} from '../types';
+import React, {useEffect, useRef, useState} from 'react';
+import {RobotOutlined, SendOutlined, UserOutlined} from '@ant-design/icons';
+import {Button, Card, Input, Space, Spin} from 'antd';
+import {chatService} from '../services/chatService';
 
 interface ChatPanelProps {
   onFrontendAction?: (action: FrontendAction) => void;
 }
 
-export const ChatPanel: React.FC<ChatPanelProps> = ({ onFrontendAction }) => {
+export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +19,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onFrontendAction }) => {
   const userId = 'user-123'; // 固定用户ID
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
   };
 
   useEffect(() => {
@@ -72,8 +72,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onFrontendAction }) => {
 
   return (
     <Card
-      title={<><RobotOutlined /> 3D 建模助手</>}
-      bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 0 }}
+      title={<><RobotOutlined/> 3D 建模助手</>}
+      bodyStyle={{flex: 1, display: 'flex', flexDirection: 'column', padding: 0}}
     >
       <div className="messages-area" style={{
         flex: 1,
@@ -97,10 +97,10 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onFrontendAction }) => {
                 maxWidth: '80%',
                 backgroundColor: message.role === 'user' ? '#1890ff' : '#f5f5f5'
               }}
-              bodyStyle={{ padding: '8px 12px' }}
+              bodyStyle={{padding: '8px 12px'}}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {message.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
+              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                {message.role === 'user' ? <UserOutlined/> : <RobotOutlined/>}
                 <span>{message.content}</span>
               </div>
             </Card>
@@ -123,17 +123,17 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onFrontendAction }) => {
         )}
 
         {isLoading && (
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <Card size="small" style={{ backgroundColor: '#f5f5f5' }}>
-              <Spin size="small" /> 正在处理...
+          <div style={{display: 'flex', justifyContent: 'flex-start'}}>
+            <Card size="small" style={{backgroundColor: '#f5f5f5'}}>
+              <Spin size="small"/> 正在处理...
             </Card>
           </div>
         )}
 
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef}/>
       </div>
 
-      <div style={{ padding: '16px', borderTop: '1px solid #f0f0f0' }}>
+      <div style={{padding: '16px', borderTop: '1px solid #f0f0f0'}}>
         <Input.Group compact>
           <Input
             value={input}
@@ -141,14 +141,14 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onFrontendAction }) => {
             onPressEnter={() => handleSendMessage(input)}
             placeholder="输入消息..."
             disabled={isLoading}
-            style={{ width: 'calc(100% - 80px)' }}
+            style={{width: 'calc(100% - 80px)'}}
           />
           <Button
             type="primary"
-            icon={<SendOutlined />}
+            icon={<SendOutlined/>}
             onClick={() => handleSendMessage(input)}
             disabled={isLoading || !input.trim()}
-            style={{ width: '80px' }}
+            style={{width: '80px'}}
           >
             发送
           </Button>
