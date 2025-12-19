@@ -1,10 +1,18 @@
+type ResultType = {
+  conversationId: string
+  message: {
+    aiMessage: string,
+    drawnObjects: Array<any>
+  }
+}
+
 // 聊天服务类
 class ChatService {
   // API 基础地址
   private baseUrl = 'http://localhost:8000/api';
 
   // 发送消息方法
-  async sendMessage(message: string, userId: string, conversationId: string): Promise<any> {
+  async sendMessage(message: string, userId: string, conversationId: string): Promise<ResultType> {
     // 发送 HTTP 请求
     const response = await fetch(`${this.baseUrl}/chat`, {
       // 请求方法
