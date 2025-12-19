@@ -1,46 +1,26 @@
+import { tool } from 'langchain';
+import * as z from 'zod';
+
 // 电路元件工具
-
-function createComponent(type: string, properties: any) {
-  const componentId = `comp_${Date.now()}`;
-  
-  console.log(`[元件] 创建${type}元件:`, properties);
-  
-  let processedProperties;
-  switch (type) {
-    case '电阻':
-    case 'resistor':
-      processedProperties = {
-        resistance: properties.resistance || '1kΩ',
-        power: properties.power || '0.25W',
-        tolerance: properties.tolerance || '5%'
-      };
-      break;
-    case '电容':
-    case 'capacitor':
-      processedProperties = {
-        capacitance: properties.capacitance || '100μF',
-        voltage: properties.voltage || '25V',
-        type: properties.type || 'ceramic'
-      };
-      break;
-    case '电感':
-    case 'inductor':
-      processedProperties = {
-        inductance: properties.inductance || '1mH',
-        current: properties.current || '1A',
-        tolerance: properties.tolerance || '10%'
-      };
-      break;
-    default:
-      processedProperties = properties;
+export const createComponentTool = tool(
+  ({ type, properties }) => {
+    const componentId = `comp_${Date.now()}`;
+    console.log(`[元件] 创建${type}元件:`, properties);
+    return `已创建${type}电路元件，ID: ${componentId}`;
+  },
+  {
+    name: 'create_component',
+    description: '创建电路元件',
+    schema: z.object({
+      type: z.string().describe('元件类型：电阻、电容、电感'),
+      properties: z.object({
+        resistance: z.string().optional().describe('电阻值'),
+        capacitance: z.string().optional().describe('电容值'),
+        inductance: z.string().optional().describe('电感值'),
+        voltage: z.string().optional().describe('额定电压'),
+        power: z.string().optional().describe('额定功率'),
+        tolerance: z.string().optional().describe('容差')
+      }).describe('元件属性')
+    })
   }
-
-  return {
-    success: true,
-    componentId,
-    type,
-    properties: processedProperties
-  };
-}
-
-export { createComponent };
+);
