@@ -1,6 +1,6 @@
 import {ChatMessage, FrontendAction} from '../types';
 import React, {useEffect, useRef, useState} from 'react';
-import {RobotOutlined, SendOutlined, UserOutlined} from '@ant-design/icons';
+import {AndroidOutlined, SendOutlined, UserOutlined} from '@ant-design/icons';
 import {Button, Card, Input, Space, Spin} from 'antd';
 import {chatService} from '../services/chatService';
 
@@ -72,7 +72,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
 
   return (
     <Card
-      title={<><RobotOutlined/> 3D 建模助手</>}
+      title={<><AndroidOutlined style={{fontSize: '16px'}}/> 3D 建模助手</>}
       bodyStyle={{flex: 1, display: 'flex', flexDirection: 'column', padding: 0}}
     >
       <div className="messages-area" style={{
@@ -95,13 +95,21 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
               size="small"
               style={{
                 maxWidth: '80%',
-                backgroundColor: message.role === 'user' ? '#1890ff' : '#f5f5f5'
+                backgroundColor: message.role === 'user' ? '#e6f4ff' : '#f6ffed',
+                border: message.role === 'user' ? '1px solid #91caff' : '1px solid #b7eb8f',
+                borderRadius: '12px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
               }}
-              bodyStyle={{padding: '8px 12px'}}
+              bodyStyle={{padding: '10px 14px'}}
             >
               <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                {message.role === 'user' ? <UserOutlined/> : <RobotOutlined/>}
-                <span>{message.content}</span>
+                {message.role === 'user' ? 
+                  <UserOutlined style={{color: '#1677ff', fontSize: '16px'}}/> : 
+                  <AndroidOutlined style={{color: '#52c41a', fontSize: '16px'}}/>
+                }
+                <span style={{color: message.role === 'user' ? '#1677ff' : '#262626'}}>
+                  {message.content}
+                </span>
               </div>
             </Card>
           </div>
