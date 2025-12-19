@@ -1,6 +1,6 @@
 import {ChatOpenAI} from '@langchain/openai';
 import {createAgent} from 'langchain';
-import {createComponentTool, createGeometryTool} from "../tools";
+import {drawLineTool} from "../tools";
 
 // 基于 LangChain 的 Agent 客户端
 export class AgentClient {
@@ -18,7 +18,7 @@ export class AgentClient {
 
     this.agent = createAgent({
       model,
-      tools: [createGeometryTool, createComponentTool],
+      tools: [drawLineTool],
       systemPrompt: '你是一个3D建模和电气设计助手，可以帮助用户创建几何体和电路元件。'
     });
   }
