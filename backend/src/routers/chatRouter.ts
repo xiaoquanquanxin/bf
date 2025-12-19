@@ -8,6 +8,11 @@ import {agentClient} from "../services/llmClient";
 // 创建路由器实例
 const router = Router();
 
+type MessagesType = Array<{
+  role: 'user',
+  content: string
+}>
+
 // 聊天接口
 router.post('/chat', async (req, res) => {
   // 解构请求参数
@@ -15,8 +20,8 @@ router.post('/chat', async (req, res) => {
 
   try {
     // 构建消息数组
-    const messages = [
-      {role: 'user', content: message, userId}
+    const messages: MessagesType = [
+      {role: 'user', content: message}
     ];
 
     // 调用 Agent 处理消息
