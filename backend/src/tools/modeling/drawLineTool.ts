@@ -6,10 +6,12 @@ import {Vector3} from "three";
 import {VertexUtils} from "../../utils";
 // 导入画线工具的参数验证模式
 import {drawLineSchema} from "../../schemas";
+// 导入 Zod 类型推断工具
+import {z} from "zod";
 
 // 创建画线工具
 const drawLineTool = tool(
-  (params) => {
+  (params: z.infer<typeof drawLineSchema>) => {
     // 调试输出
     console.log('drawLineTool - params:', params);
 
