@@ -102,14 +102,19 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
               }}
               bodyStyle={{padding: '10px 14px'}}
             >
-              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                {message.role === 'user' ? 
-                  <UserOutlined style={{color: '#1677ff', fontSize: '16px'}}/> : 
-                  <AndroidOutlined style={{color: '#52c41a', fontSize: '16px'}}/>
-                }
-                <span style={{color: message.role === 'user' ? '#1677ff' : '#262626'}}>
-                  {message.content}
-                </span>
+              <div>
+                <div style={{fontSize: '11px', color: '#999', textAlign: message.role === 'user' ? 'right' : 'left', marginBottom: '4px'}}>
+                  {message.timestamp.toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})}
+                </div>
+                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                  {message.role === 'user' ? 
+                    <UserOutlined style={{color: '#1677ff', fontSize: '16px'}}/> : 
+                    <AndroidOutlined style={{color: '#52c41a', fontSize: '16px'}}/>
+                  }
+                  <span style={{color: message.role === 'user' ? '#1677ff' : '#262626'}}>
+                    {message.content}
+                  </span>
+                </div>
               </div>
             </Card>
           </div>
