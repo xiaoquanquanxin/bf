@@ -1,6 +1,7 @@
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  drawnObjects: any;
   timestamp: Date;
 }
 

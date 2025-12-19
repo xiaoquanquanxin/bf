@@ -1,9 +1,7 @@
 type ResultType = {
   conversationId: string
-  message: {
-    aiMessage: string,
-    drawnObjects: Array<any>
-  }
+  aiMessage: string,
+  drawnObjects: Array<any>
 }
 
 // 聊天服务类

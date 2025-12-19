@@ -32,6 +32,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
     const userMessage: ChatMessage = {
       role: 'user',
       content: messageText,
+      drawnObjects: null,
       timestamp: new Date()
     };
 
@@ -40,11 +41,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
     setIsLoading(true);
 
     try {
-      const response = await chatService.sendMessage(messageText, userId, conversationId);
-
+      const response = await chatService.sendMessage(messageText, userId, conversationId)
       const assistantMessage: ChatMessage = {
         role: 'assistant',
-        content: response.message,
+        content: response.aiMessage,
+        drawnObjects: response.drawnObjects,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, assistantMessage]);
@@ -57,6 +58,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
       const errorMessage: ChatMessage = {
         role: 'assistant',
         content: '抱歉，发送消息时出现错误。请稍后重试。',
+        drawnObjects: null,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -103,12 +105,24 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
               bodyStyle={{padding: '10px 14px'}}
             >
               <div>
-                <div style={{fontSize: '11px', color: '#999', textAlign: message.role === 'user' ? 'right' : 'left', marginBottom: '4px'}}>
-                  {message.timestamp.toLocaleString('zh-CN', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'})}
+                <div style={{
+                  fontSize: '11px',
+                  color: '#999',
+                  textAlign: message.role === 'user' ? 'right' : 'left',
+                  marginBottom: '4px'
+                }}>
+                  {message.timestamp.toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                  })}
                 </div>
                 <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                  {message.role === 'user' ? 
-                    <UserOutlined style={{color: '#1677ff', fontSize: '16px'}}/> : 
+                  {message.role === 'user' ?
+                    <UserOutlined style={{color: '#1677ff', fontSize: '16px'}}/> :
                     <AndroidOutlined style={{color: '#52c41a', fontSize: '16px'}}/>
                   }
                   <span style={{color: message.role === 'user' ? '#1677ff' : '#262626'}}>
