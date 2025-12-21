@@ -1,6 +1,5 @@
 import {Router} from 'express';
-import {v4 as uuidv4} from 'uuid';
-import { modelingAgent, userAgent } from "../agents";
+import {modelingAgent, userAgent} from "../agents";
 
 const router = Router();
 
@@ -10,7 +9,7 @@ type MessagesType = Array<{
 }>
 
 // 3D建模聊天接口
-router.post('/modeling/chat', async (req, res) => {
+router.post('/chat', async (req, res) => {
   const {message, userId = 'user_123', conversationId = 'default'} = req.body;
 
   try {
