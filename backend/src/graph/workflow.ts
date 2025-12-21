@@ -16,9 +16,16 @@ type GraphState = z.infer<typeof State>;
 
 // 创建模型
 const llm = new ChatOpenAI({
+  // API 密钥
   apiKey: process.env.API_KEY!,
-  configuration: {baseURL: process.env.BASE_URL!},
+  // API 配置
+  configuration: {
+    // API 基础地址
+    baseURL: process.env.BASE_URL!,
+  },
+  // 模型名称
   model: process.env.MODEL_NAME!,
+  // 温度参数
   temperature: 0.1,
 });
 
