@@ -100,10 +100,10 @@ const shouldCallTool = (state: GraphState) => {
   const lastMessage = state.messages.at(-1);
   const hasToolCalls = lastMessage.tool_calls && lastMessage.tool_calls.length > 0;
 
-  console.log('🔍 判断是否需要工具:');
-  console.log('- 最后消息:', lastMessage.content);
-  console.log('- 工具调用:', lastMessage.tool_calls);
-  console.log('- 判断结果:', hasToolCalls ? 'tool' : 'end');
+  // console.log('🔍 判断是否需要工具:');
+  // console.log('- 最后消息:', lastMessage.content);
+  // console.log('- 工具调用:', lastMessage.tool_calls);
+  // console.log('- 判断结果:', hasToolCalls ? 'tool' : 'end');
 
   return hasToolCalls ? "tool" : "end";
 };
