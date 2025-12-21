@@ -48,6 +48,8 @@ const drawLineTool = tool(
       endPoint = startPoint.clone().add(direction.multiplyScalar(params.distance));
       // 长度即为指定距离
       length = params.distance;
+    } else {
+      throw new Error()
     }
 
     // 执行确认输出
