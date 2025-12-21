@@ -45,7 +45,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
       console.log(response.drawnObjects)
       const assistantMessage: ChatMessage = {
         role: 'assistant',
-        content: response.aiMessage,
+        content: response.response,
         drawnObjects: response.drawnObjects,
         timestamp: new Date()
       };

@@ -1,6 +1,6 @@
 type ResultType = {
   conversationId: string
-  aiMessage: string,
+  response: string,
   drawnObjects: Array<any>
 }
 
