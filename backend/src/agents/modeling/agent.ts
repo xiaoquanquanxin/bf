@@ -1,35 +1,22 @@
-import {END, START, StateGraph} from "@langchain/langgraph";
-import {ChatOpenAI} from "@langchain/openai";
+import { END, START, StateGraph } from "@langchain/langgraph";
+import { ChatOpenAI } from "@langchain/openai";
 import * as z from "zod";
-import {drawLineTool} from "../tools";
-import {saveDataTool} from "../tools/saveDataTool";
+import { drawLineTool } from "./tools/drawLineTool";
+import { saveDataTool } from "./tools/saveDataTool";
 
-// 定义状态
 const State = z.object({
   messages: z.array(z.any()),
-  sceneObjects: z.array(z.any()).default([]),
-  userId: z.string().default(""),
-  conversationId: z.string().default(""),
 });
 
-type GraphState = z.infer<typeof State>;
+type ModelingState = z.infer<typeof State>;
 
-// 创建模型
 const llm = new ChatOpenAI({
-  // API 密钥
   apiKey: process.env.API_KEY!,
-  // API 配置
-  configuration: {
-    // API 基础地址
-    baseURL: process.env.BASE_URL!,
-  },
-  // 模型名称
+  configuration: { baseURL: process.env.BASE_URL! },
   model: process.env.MODEL_NAME!,
-  // 温度参数
   temperature: 0.1,
 });
 
-// 工具注册表
 const tools = {
   draw_line: drawLineTool,
   save_data: saveDataTool,
@@ -37,10 +24,8 @@ const tools = {
 
 type ToolName = keyof typeof tools;
 
-// 绑定工具到 LLM
 const llmWithTools = llm.bindTools(Object.values(tools));
 
-// 系统提示词
 const systemPrompt = `你是一个专业的3D建模助手。
 
 你只能执行以下操作：
@@ -59,10 +44,9 @@ const systemPrompt = `你是一个专业的3D建模助手。
 对于无法完成的请求，请明确告诉用户：
 "抱歉，我无法完成[具体请求]。我只能帮您在3D空间中画线。请告诉我起点和终点坐标，或者起点、方向和距离。"`;
 
-// 节点 1：调用 LLM
-const callModel = async (state: GraphState) => {
+const callModel = async (state: ModelingState) => {
   const messages = [
-    {role: "system", content: systemPrompt},
+    { role: "system", content: systemPrompt },
     ...state.messages
   ];
   const response = await llmWithTools.invoke(messages);
@@ -71,8 +55,7 @@ const callModel = async (state: GraphState) => {
   };
 };
 
-// 节点 2：执行工具
-const executeTool = async (state: GraphState) => {
+const executeTool = async (state: ModelingState) => {
   const lastMessage = state.messages.at(-1);
   const toolCalls = lastMessage.tool_calls;
 
@@ -102,21 +85,13 @@ const executeTool = async (state: GraphState) => {
   };
 };
 
-// 条件：是否有工具调用
-const shouldCallTool = (state: GraphState) => {
+const shouldCallTool = (state: ModelingState) => {
   const lastMessage = state.messages.at(-1);
   const hasToolCalls = lastMessage.tool_calls && lastMessage.tool_calls.length > 0;
-
-  // console.log('🔍 判断是否需要工具:');
-  // console.log('- 最后消息:', lastMessage.content);
-  // console.log('- 工具调用:', lastMessage.tool_calls);
-  // console.log('- 判断结果:', hasToolCalls ? 'tool' : 'end');
-
   return hasToolCalls ? "tool" : "end";
 };
 
-// 构建图
-export const workflow = new StateGraph(State)
+export const modelingWorkflow = new StateGraph(State)
   .addNode("model", callModel)
   .addNode("tool", executeTool)
   .addEdge(START, "model")
@@ -126,4 +101,4 @@ export const workflow = new StateGraph(State)
   })
   .addEdge("tool", "model");
 
-export type {GraphState};
+export type { ModelingState };

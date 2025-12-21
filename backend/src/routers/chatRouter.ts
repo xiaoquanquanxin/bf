@@ -1,11 +1,7 @@
-// 导入 Express 路由器
 import {Router} from 'express';
-// 导入 UUID 生成器
 import {v4 as uuidv4} from 'uuid';
-// 导入 Agent 服务
-import {agentClient} from "../services/llmClient";
+import { modelingAgent, userAgent } from "../agents";
 
-// 创建路由器实例
 const router = Router();
 
 type MessagesType = Array<{
@@ -13,32 +9,46 @@ type MessagesType = Array<{
   content: string
 }>
 
-// 聊天接口
-router.post('/chat', async (req, res) => {
-  // 解构请求参数
-  const {message, userId, conversationId} = req.body;
+// 3D建模聊天接口
+router.post('/modeling/chat', async (req, res) => {
+  const {message, userId = 'user_123', conversationId = 'default'} = req.body;
 
   try {
-    // 构建消息数组
     const messages: MessagesType = [
       {role: 'user', content: message}
     ];
 
-    // 调用 Agent 处理消息
-    const response = await agentClient.processMessage(messages);
+    const response = await modelingAgent.chat(messages, userId, conversationId);
 
-    // 返回响应结果
     res.json({
       ...response,
-      conversationId: conversationId || uuidv4()
+      conversationId
     });
   } catch (error) {
-    // 错误日志
-    console.error('聊天错误:', error);
-    // 返回错误响应
+    console.error('3D建模聊天错误:', error);
     res.status(500).json({error: '服务器错误'});
   }
 });
 
-// 导出聊天路由器
+// 用户管理聊天接口
+router.post('/user/chat', async (req, res) => {
+  const {message, userId = 'user_123', conversationId = 'default'} = req.body;
+
+  try {
+    const messages: MessagesType = [
+      {role: 'user', content: message}
+    ];
+
+    const response = await userAgent.chat(messages, userId, conversationId);
+
+    res.json({
+      ...response,
+      conversationId
+    });
+  } catch (error) {
+    console.error('用户管理聊天错误:', error);
+    res.status(500).json({error: '服务器错误'});
+  }
+});
+
 export {router as chatRouter};

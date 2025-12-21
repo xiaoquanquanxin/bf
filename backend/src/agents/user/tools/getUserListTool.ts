@@ -1,6 +1,6 @@
 import { tool } from "langchain";
 import { z } from "zod";
-import { ToolResult } from "../types";
+import { ToolResult } from "../../../types";
 
 const getUserListSchema = z.object({
   page: z.number().default(1).describe("页码"),

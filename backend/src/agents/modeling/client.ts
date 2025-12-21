@@ -1,33 +1,29 @@
-import {AgentResult, ToolResult} from "../types";
-import {MemorySaver} from "@langchain/langgraph";
-import {GraphState, workflow} from "../graph/workflow";
-
+import { MemorySaver } from "@langchain/langgraph";
+import { modelingWorkflow, ModelingState } from "./agent";
+import { AgentResult, ToolResult } from "../../types";
 
 const checkpointer = new MemorySaver();
-const app = workflow.compile({checkpointer});
+const modelingApp = modelingWorkflow.compile({ checkpointer });
 
-export class AgentClient {
-  async processMessage(
+export class ModelingAgent {
+  async chat(
     messages: Array<{ role: string; content: string }>,
     userId: string = "user_123",
     conversationId: string = "default"
   ): Promise<AgentResult> {
-
+    
     const config = {
-      configurable: {
-        thread_id: `${userId}_${conversationId}`
+      configurable: { 
+        thread_id: `modeling_${userId}_${conversationId}` 
       }
     };
 
-    const initialState: GraphState = {
+    const initialState: ModelingState = {
       messages: messages,
-      sceneObjects: [],
-      userId,
-      conversationId,
     };
 
-    const result = await app.invoke(initialState, config);
-
+    const result = await modelingApp.invoke(initialState, config);
+    
     const drawnObjects: Array<ToolResult> = [];
     for (const msg of result.messages) {
       if (msg.role === 'tool') {
@@ -47,4 +43,4 @@ export class AgentClient {
   }
 }
 
-export const agentClient = new AgentClient();
+export const modelingAgent = new ModelingAgent();

@@ -1,6 +1,6 @@
-import {tool} from "langchain";
-import {z} from "zod";
-import {ToolResult} from "../types";
+import { tool } from "langchain";
+import { z } from "zod";
+import { ToolResult } from "../../../types";
 
 const saveDataSchema = z.object({
   objectId: z.string().describe("要保存的对象ID"),
@@ -12,8 +12,7 @@ export const saveDataTool = tool(
   async (params: z.infer<typeof saveDataSchema>): Promise<ToolResult<any>> => {
     // TODO: 实现实际的数据库保存逻辑
     // 静默保存，不输出给用户
-    console.log('修改数据后保存数据')
-
+    
     return {
       id: params.objectId,
       success: true,
