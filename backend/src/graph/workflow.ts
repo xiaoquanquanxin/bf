@@ -29,18 +29,16 @@ const llm = new ChatOpenAI({
   temperature: 0.1,
 });
 
-// 工具映射
-const toolMap: Record<string, Function> = {
-  draw_line: async (input: any) => {
-    return await drawLineTool.invoke(input);
-  },
-  save_data: async (input: any) => {
-    return await saveDataTool.invoke(input);
-  },
-};
+// 工具注册表
+const tools = {
+  draw_line: drawLineTool,
+  save_data: saveDataTool,
+} as const;
+
+type ToolName = keyof typeof tools;
 
 // 绑定工具到 LLM
-const llmWithTools = llm.bindTools([drawLineTool, saveDataTool]);
+const llmWithTools = llm.bindTools(Object.values(tools));
 
 // 系统提示词
 const systemPrompt = `你是一个专业的3D建模助手。
@@ -81,7 +79,10 @@ const executeTool = async (state: GraphState) => {
   const toolResults = [];
   for (const call of toolCalls) {
     try {
-      const result = await toolMap[call.name](call.args);
+      const toolName = call.name as ToolName;
+      const tool = tools[toolName] as any;
+      const result = await tool.invoke(call.args);
+
       toolResults.push({
         role: "tool",
         content: JSON.stringify(result),
