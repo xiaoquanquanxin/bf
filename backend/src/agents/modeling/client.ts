@@ -22,28 +22,31 @@ export class ModelingAgent {
     };
 
     try {
-      // ✅ 改成 "messages" 模式，这样才能逐令牌接收
+      // 同时用两个模式
       const stream = await modelingApp.stream(
         initialState,
         {
           ...config,
-          streamMode: "messages"
+          streamMode: ['messages', 'updates']  // 两个都要
         }
       );
 
-      for await (const [token, metadata] of stream) {
-        console.log(`📍 Node: ${metadata.langgraph_node}`);
-
-        // token 是实际的令牌对象
-        if (token.contentBlocks && token.contentBlocks.length > 0) {
-          for (const block of token.contentBlocks) {
-            if (block.type === 'text' && block.text) {
-              console.log(`📝 Token: ${block.text}`);
-              yield {
-                type: 'message',
-                data: {content: block.text}
-              };
-            }
+      for await (const [streamMode, chunk] of stream) {
+        if (streamMode === 'messages') {
+          console.log(chunk[0])
+          // 处理 LLM 令牌流 → 显示逐字对话
+          yield {
+            type: 'message',
+            data: {content: chunk[0].content}
+          };
+        } else if (streamMode === 'updates') {
+          // 处理工具执行结果 → 显示 3D 操作结果
+          const [nodeName, nodeOutput] = Object.entries(chunk)[0];
+          if (nodeName === 'tool') {
+            yield {
+              type: 'tool',
+              data: nodeOutput
+            };
           }
         }
       }
