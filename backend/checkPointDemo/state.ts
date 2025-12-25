@@ -12,3 +12,9 @@ interface State {
 // - 一次 invoke() 中生效
 // - invoke() 结束就消失（除非保存到 checkpoint）
 // - Supervisor Agent 和所有 SubAgent 都可以访问
+
+
+// State 和 Checkpoint 的关系
+// 简单类比
+// State 就像你的"笔记本"
+// Checkpoint 就像你对"笔记本"做的"快照"
