@@ -1,8 +1,9 @@
-import { END, START, StateGraph } from "@langchain/langgraph";
-import { ChatOpenAI } from "@langchain/openai";
+import {RunnableConfig} from "@langchain/core/runnables";
+import {END, START, StateGraph} from "@langchain/langgraph";
+import {ChatOpenAI} from "@langchain/openai";
 import * as z from "zod";
-import { drawLineTool } from "./tools/drawLineTool";
-import { saveDataTool } from "./tools/saveDataTool";
+import {drawLineTool} from "./tools/drawLineTool";
+import {saveDataTool} from "./tools/saveDataTool";
 
 const State = z.object({
   messages: z.array(z.any()),
@@ -12,9 +13,10 @@ type ModelingState = z.infer<typeof State>;
 
 const llm = new ChatOpenAI({
   apiKey: process.env.API_KEY!,
-  configuration: { baseURL: process.env.BASE_URL! },
+  configuration: {baseURL: process.env.BASE_URL!},
   model: process.env.MODEL_NAME!,
   temperature: 0.1,
+  streaming: true,  // ✅ 启用流式
 });
 
 const tools = {
@@ -44,12 +46,46 @@ const systemPrompt = `你是一个专业的3D建模助手。
 对于无法完成的请求，请明确告诉用户：
 "抱歉，我无法完成[具体请求]。我只能帮您在3D空间中画线。请告诉我起点和终点坐标，或者起点、方向和距离。"`;
 
-const callModel = async (state: ModelingState) => {
+// ✅ 关键修改：添加 config 参数，并使用 config.writer 逐令牌发送
+const callModel = async (state: ModelingState, config?: RunnableConfig) => {
   const messages = [
-    { role: "system", content: systemPrompt },
+    {role: "system", content: systemPrompt},
     ...state.messages
   ];
-  const response = await llmWithTools.invoke(messages);
+
+  let fullContent = "";
+  let hasToolCalls = false;
+  let toolCalls: any[] = [];
+
+  // 使用 stream() 获取流式令牌
+  const stream = await llmWithTools.stream(messages, config);
+
+  for await (const chunk of stream) {
+    // 累积文本内容
+    if (chunk.content) {
+      fullContent += chunk.content;
+      // ✅ 逐令牌发送给客户端（通过 config.writer）
+      config?.writer?.(chunk.content);
+    }
+
+    // 检查是否有 tool_calls
+    if (chunk.tool_calls && chunk.tool_calls.length > 0) {
+      hasToolCalls = true;
+      toolCalls = chunk.tool_calls;
+    }
+  }
+
+  // 构建完整消息对象
+  const response: any = {
+    role: "assistant",
+    content: fullContent,
+  };
+
+  // 如果有工具调用，也要加入响应中
+  if (hasToolCalls) {
+    response.tool_calls = toolCalls;
+  }
+
   return {
     messages: [...state.messages, response],
   };
@@ -101,4 +137,4 @@ export const modelingWorkflow = new StateGraph(State)
   })
   .addEdge("tool", "model");
 
-export type { ModelingState };
+export type {ModelingState};
