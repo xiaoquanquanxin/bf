@@ -14,4 +14,10 @@ interface AgentResult {
   messages: Array<any>;                 // 完整的消息历史
 }
 
-export {ToolResult, AgentResult}
+// Stream 事件类型
+interface StreamEvent {
+  type: 'message' | 'tool' | 'end';
+  data: any;
+}
+
+export {ToolResult, AgentResult, StreamEvent}

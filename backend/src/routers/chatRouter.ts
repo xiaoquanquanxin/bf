@@ -8,8 +8,8 @@ type MessagesType = Array<{
   content: string
 }>
 
-// 3D建模聊天接口
-router.post('/chat', async (req, res) => {
+// 3D建模流式聊天接口
+router.post('/chat/stream', async (req, res) => {
   const {message, userId = 'user_123', conversationId = 'default'} = req.body;
 
   try {
@@ -17,20 +17,26 @@ router.post('/chat', async (req, res) => {
       {role: 'user', content: message}
     ];
 
-    const response = await modelingAgent.chat(messages, userId, conversationId);
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
-    res.json({
-      ...response,
-      conversationId
-    });
+    for await (const event of modelingAgent.chatStream(messages, userId, conversationId)) {
+      res.write(`data: ${JSON.stringify(event)}\n\n`);
+    }
+
+    res.write('data: [DONE]\n\n');
+    res.end();
   } catch (error) {
-    console.error('3D建模聊天错误:', error);
-    res.status(500).json({error: '服务器错误'});
+    console.error('3D建模流式聊天错误:', error);
+    res.write(`data: ${JSON.stringify({type: 'error', data: {message: '服务器错误'}})}\n\n`);
+    res.end();
   }
 });
 
-// 用户管理聊天接口
-router.post('/user/chat', async (req, res) => {
+// 用户管理流式聊天接口
+router.post('/user/chat/stream', async (req, res) => {
   const {message, userId = 'user_123', conversationId = 'default'} = req.body;
 
   try {
@@ -38,15 +44,21 @@ router.post('/user/chat', async (req, res) => {
       {role: 'user', content: message}
     ];
 
-    const response = await userAgent.chat(messages, userId, conversationId);
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
-    res.json({
-      ...response,
-      conversationId
-    });
+    for await (const event of userAgent.chatStream(messages, userId, conversationId)) {
+      res.write(`data: ${JSON.stringify(event)}\n\n`);
+    }
+
+    res.write('data: [DONE]\n\n');
+    res.end();
   } catch (error) {
-    console.error('用户管理聊天错误:', error);
-    res.status(500).json({error: '服务器错误'});
+    console.error('用户管理流式聊天错误:', error);
+    res.write(`data: ${JSON.stringify({type: 'error', data: {message: '服务器错误'}})}\n\n`);
+    res.end();
   }
 });
 

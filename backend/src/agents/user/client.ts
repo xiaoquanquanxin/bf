@@ -1,20 +1,19 @@
-import { MemorySaver } from "@langchain/langgraph";
-import { userWorkflow, UserState } from "./agent";
-import { AgentResult, ToolResult } from "../../types";
+import {MemorySaver} from "@langchain/langgraph";
+import {UserState, userWorkflow} from "./agent";
+import {StreamEvent} from "../../types";
 
 const checkpointer = new MemorySaver();
-const userApp = userWorkflow.compile({ checkpointer });
+const userApp = userWorkflow.compile({checkpointer});
 
 export class UserAgent {
-  async chat(
+  async* chatStream(
     messages: Array<{ role: string; content: string }>,
     userId: string = "user_123",
     conversationId: string = "default"
-  ): Promise<AgentResult> {
-    
+  ): AsyncGenerator<StreamEvent> {
     const config = {
-      configurable: { 
-        thread_id: `user_${userId}_${conversationId}` 
+      configurable: {
+        thread_id: `user_${userId}_${conversationId}`
       }
     };
 
@@ -22,23 +21,38 @@ export class UserAgent {
       messages: messages,
     };
 
-    const result = await userApp.invoke(initialState, config);
-    
-    const userData: Array<ToolResult> = [];
-    for (const msg of result.messages) {
-      if (msg.role === 'tool') {
-        try {
-          userData.push(JSON.parse(msg.content));
-        } catch (e) {
-          console.error('解析用户工具结果失败:', e);
+    const stream = userApp.stream(initialState, config);
+
+    for await (const chunk of await stream) {
+      const [nodeName, nodeOutput] = Object.entries(chunk)[0];
+
+      if (nodeName === 'model') {
+        const lastMessage = nodeOutput.messages[nodeOutput.messages.length - 1];
+        if (lastMessage.content) {
+          yield {
+            type: 'message',
+            data: {content: lastMessage.content}
+          };
+        }
+      } else if (nodeName === 'tool') {
+        const toolMessages = nodeOutput.messages.filter((msg: any) => msg.role === 'tool');
+        for (const toolMsg of toolMessages) {
+          try {
+            const toolResult = JSON.parse(toolMsg.content);
+            yield {
+              type: 'tool',
+              data: toolResult
+            };
+          } catch (e) {
+            console.error('解析用户工具结果失败:', e);
+          }
         }
       }
     }
 
-    return {
-      response: result.messages[result.messages.length - 1].content as string,
-      drawnObjects: userData, // 复用字段名，实际是用户数据
-      messages: result.messages
+    yield {
+      type: 'end',
+      data: {}
     };
   }
 }
