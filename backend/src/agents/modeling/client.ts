@@ -22,73 +22,43 @@ export class ModelingAgent {
     };
 
     try {
-      const stream = await modelingApp.stream(initialState, config);
+      // ✅ 改成 "messages" 模式，这样才能逐令牌接收
+      const stream = await modelingApp.stream(
+        initialState,
+        {
+          ...config,
+          streamMode: "messages"
+        }
+      );
 
-      for await (const chunk of stream) {
-        const [nodeName, nodeOutput] = Object.entries(chunk)[0];
+      for await (const [token, metadata] of stream) {
+        console.log(`📍 Node: ${metadata.langgraph_node}`);
 
-        if (nodeName === 'model') {
-          const lastMessage = nodeOutput.messages[nodeOutput.messages.length - 1];
-          if (lastMessage.content) {
-            // 逐字符输出 AI 回复
-            const content = lastMessage.content as string;
-            for (let i = 0; i < content.length; i++) {
+        // token 是实际的令牌对象
+        if (token.contentBlocks && token.contentBlocks.length > 0) {
+          for (const block of token.contentBlocks) {
+            if (block.type === 'text' && block.text) {
+              console.log(`📝 Token: ${block.text}`);
               yield {
                 type: 'message',
-                data: {content: content[i]}
+                data: {content: block.text}
               };
-              await new Promise(resolve => setTimeout(resolve, 20));
-            }
-          }
-        } else if (nodeName === 'tool') {
-          const toolMessages = nodeOutput.messages.filter((msg: any) => msg.role === 'tool');
-          for (const toolMsg of toolMessages) {
-            try {
-              const toolResult = JSON.parse(toolMsg.content);
-              yield {
-                type: 'tool',
-                data: toolResult
-              };
-            } catch (e) {
-              console.error('解析 tool 结果失败:', e);
             }
           }
         }
       }
+
+      yield {
+        type: 'end',
+        data: {}
+      };
     } catch (error) {
       console.error('LangGraph stream 错误:', error);
-      // 如果 stream 失败，使用普通调用
-      const result = await modelingApp.invoke(initialState, config);
-
-      const response = result.messages[result.messages.length - 1].content as string;
-      for (let i = 0; i < response.length; i++) {
-        yield {
-          type: 'message',
-          data: {content: response[i]}
-        };
-        await new Promise(resolve => setTimeout(resolve, 20));
-      }
-
-      // 处理工具结果
-      for (const msg of result.messages) {
-        if (msg.role === 'tool') {
-          try {
-            const toolResult = JSON.parse(msg.content);
-            yield {
-              type: 'tool',
-              data: toolResult
-            };
-          } catch (e) {
-            console.error('解析 tool 结果失败:', e);
-          }
-        }
-      }
+      yield {
+        type: 'error',
+        data: {message: '执行失败'}
+      };
     }
-
-    yield {
-      type: 'end',
-      data: {}
-    };
   }
 }
 
