@@ -7,7 +7,7 @@ type ResultType = {
 // 聊天服务类
 class ChatService {
   // API 基础地址
-  private baseUrl = 'http://localhost:8000/api';
+  private baseUrl = 'http://localhost:8888/api';
 
   // 发送消息方法
   async sendMessage(message: string, userId: string, conversationId: string): Promise<ResultType> {
