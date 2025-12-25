@@ -16,7 +16,7 @@ interface AgentResult {
 
 // Stream 事件类型
 interface StreamEvent {
-  type: 'message' | 'tool' | 'end';
+  type: 'message' | 'tool' | 'end' | 'error';
   data: any;
 }
 
