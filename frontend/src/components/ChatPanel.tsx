@@ -40,30 +40,87 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
     setInput('');
     setIsLoading(true);
 
-    try {
-      const response = await chatService.sendMessage(messageText, userId, conversationId)
-      console.log(response.drawnObjects)
-      const assistantMessage: ChatMessage = {
-        role: 'assistant',
-        content: response.response,
-        drawnObjects: response.drawnObjects,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, assistantMessage]);
+    // 创建一个临时的助手消息用于流式更新
+    const assistantMessage: ChatMessage = {
+      role: 'assistant',
+      content: '',
+      drawnObjects: [],
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, assistantMessage]);
 
-      if (response.conversationId) {
-        setConversationId(response.conversationId);
-      }
+    try {
+      // 使用流式请求
+      chatService.sendMessageStream(
+        messageText,
+        userId,
+        conversationId,
+        (event) => {
+          switch (event.type) {
+            case 'message':
+              // 更新消息内容
+              setMessages(prev => {
+                const newMessages = [...prev];
+                const lastIndex = newMessages.length - 1;
+                if (newMessages[lastIndex]?.role === 'assistant') {
+                  newMessages[lastIndex] = {
+                    ...newMessages[lastIndex],
+                    content: newMessages[lastIndex].content + event.data.content
+                  };
+                }
+                return newMessages;
+              });
+              break;
+            case 'tool':
+              // 添加工具结果
+              setMessages(prev => {
+                const newMessages = [...prev];
+                const lastIndex = newMessages.length - 1;
+                if (newMessages[lastIndex]?.role === 'assistant') {
+                  newMessages[lastIndex] = {
+                    ...newMessages[lastIndex],
+                    drawnObjects: [...(newMessages[lastIndex].drawnObjects || []), event.data]
+                  };
+                }
+                return newMessages;
+              });
+              break;
+            case 'end':
+              console.log('流结束');
+              setIsLoading(false);
+              break;
+            case 'error':
+              console.error('流错误:', event.data.message);
+              setMessages(prev => {
+                const newMessages = [...prev];
+                const lastIndex = newMessages.length - 1;
+                if (newMessages[lastIndex]?.role === 'assistant') {
+                  newMessages[lastIndex] = {
+                    ...newMessages[lastIndex],
+                    content: '抱歉，处理消息时出现错误。'
+                  };
+                }
+                return newMessages;
+              });
+              setIsLoading(false);
+              break;
+          }
+        }
+      );
+
     } catch (error) {
       console.error('发送消息失败:', error);
-      const errorMessage: ChatMessage = {
-        role: 'assistant',
-        content: '抱歉，发送消息时出现错误。请稍后重试。',
-        drawnObjects: null,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
+      setMessages(prev => {
+        const newMessages = [...prev];
+        const lastIndex = newMessages.length - 1;
+        if (newMessages[lastIndex]?.role === 'assistant') {
+          newMessages[lastIndex] = {
+            ...newMessages[lastIndex],
+            content: '抱歉，发送消息时出现错误。请稍后重试。'
+          };
+        }
+        return newMessages;
+      });
       setIsLoading(false);
     }
   };
