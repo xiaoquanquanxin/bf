@@ -6,7 +6,6 @@ interface Scene3DProps {
   onExecuteTask?: (option: string) => void;
 }
 
-
 export const Scene3D: React.FC<Scene3DProps> = ({onExecuteTask}) => {
   return (
     <div style={{width: '100%', height: '100%'}}>
