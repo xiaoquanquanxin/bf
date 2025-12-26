@@ -1,24 +1,28 @@
 import {ToolResult} from "../../../types";
 import {tool} from "langchain";
 import {generateUUID} from "three/src/math/MathUtils";
+import {wsManager} from "../../../utils/websocket";
 
-type LineResult = ToolResult<{
-  callList: Array<{
-    call: string,
-    params: any
-  }>
-}>;
+type LineResult = ToolResult<null>;
 
 const dispatchDrawLine = tool(
-  (): LineResult => {
+  (args: { startPoint: [number, number, number], endPoint: [number, number, number] }): LineResult => {
+    const lineData = {
+      type: 'drawLine',
+      startPoint: args.startPoint,
+      endPoint: args.endPoint,
+      timestamp: Date.now()
+    };
+
+    // 通过 WebSocket 发送给前端
+    wsManager.broadcast(lineData);
+
     return {
       id: generateUUID(),
       timestamp: Date.now(),
       success: true,
-      message: '123456789',
-      data: {
-        callList: [{call: "123456789", params: undefined}]
-      },
+      message: `线条已发送给 ${wsManager.getClientCount()} 个客户端`,
+      data: null
     }
   },
   {
