@@ -6,8 +6,12 @@ import {wsService} from './services/websocketService';
 import 'antd/dist/reset.css';
 import './App.css';
 
+interface Scene3DRef {
+  drawLine: (startPoint: number[], endPoint: number[]) => void;
+}
+
 function App() {
-  const scene3DRef = useRef<any>(null);
+  const scene3DRef = useRef<Scene3DRef>(null);
   const wsInitialized = useRef(false);
 
   useEffect(() => {
@@ -27,6 +31,8 @@ function App() {
     // 监听画线消息
     wsService.on('drawLine', (data: any) => {
       console.log('收到画线消息:', data);
+      console.log(scene3DRef.current)
+      debugger
       if (scene3DRef.current) {
         scene3DRef.current.drawLine(data.startPoint, data.endPoint);
       }
@@ -53,7 +59,7 @@ function App() {
   return (
     <div className="app">
       <div className="left">
-        <Scene3D onExecuteTask={(option) => console.log('执行任务:', option)}/>
+        <Scene3D ref={scene3DRef} onExecuteTask={(option) => console.log('执行任务:', option)}/>
       </div>
       <div className="right">
         <ChatPanel onFrontendAction={handleFrontendAction}/>

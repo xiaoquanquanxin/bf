@@ -49,9 +49,9 @@ const drawAndDispatchLineTool = tool(
 
 
     // 通过 WebSocket 实时发送给所有连接的前端客户端
-    console.log('📡 发送线条数据给前端:', lineData)
+
     wsManager.broadcast(lineData)
-    console.log(`✅ 已成功发送给 ${wsManager.getClientCount()} 个客户端`)
+
 
     // 返回工具执行结果（给 Agent 使用）
     return {
