@@ -1,10 +1,10 @@
-import { ToolResult } from "../../../types";
-import { tool } from "langchain";
-import { Vector3 } from "three";
-import { generateUUID } from 'three/src/math/MathUtils'
-import { VertexUtils } from "../../../utils";
-import { drawLineSchema } from "../../../schemas";
-import { z } from "zod";
+import {ToolResult} from "../../../types";
+import {Vector3} from "three";
+import {VertexUtils} from "../../../utils";
+import {tool} from "langchain";
+import {generateUUID} from 'three/src/math/MathUtils'
+import {drawLineSchema} from "../../../schemas";
+import {z} from "zod";
 
 type LineResult = ToolResult<{
   startPoint: { x: number; y: number; z: number };
@@ -50,4 +50,4 @@ const drawLineTool = tool(
   }
 );
 
-export { drawLineTool }
+export {drawLineTool}
