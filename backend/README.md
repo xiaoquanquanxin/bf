@@ -3,15 +3,17 @@
 ## 环境配置
 
 1. 复制环境变量文件：
+
 ```bash
 cp .env.example .env
 ```
 
 2. 编辑 `.env` 文件，填入你的配置：
+
 ```
 API_KEY=your_api_key_here
 BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
-MODEL_NAME=qwen-plus
+MODEL_NAME=qwen-turbo
 PORT=8000
 ```
 
