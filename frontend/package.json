@@ -2,7 +2,6 @@
   "name": "mychatapp-frontend",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "yarn@1.22.19",
   "dependencies": {
     "@ant-design/icons": "5.2.6",
     "@react-three/drei": "9.122.0",
