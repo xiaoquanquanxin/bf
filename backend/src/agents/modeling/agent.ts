@@ -3,6 +3,7 @@ import {ChatOpenAI} from "@langchain/openai";
 import * as z from "zod";
 import {drawLineTool} from "./tools/drawLineTool";
 import {saveDataTool} from "./tools/saveDataTool";
+import {dispatchDrawLine} from "./tools/dispatchDrawLine";
 
 const State = z.object({
   messages: z.array(z.any()),
@@ -20,6 +21,7 @@ const llm = new ChatOpenAI({
 
 const tools = {
   draw_line: drawLineTool,
+  dispatch_draw_line: dispatchDrawLine,
   save_data: saveDataTool,
 } as const;
 
@@ -30,7 +32,8 @@ const llmWithTools = llm.bindTools(Object.values(tools));
 const systemPrompt = `你是一个专业的3D建模助手。
 
 你只能执行以下操作：
-- 画线（draw_line）：在3D空间中绘制线段
+- 画线（draw_line）：生成一条线段的数据
+- 推送前端方法（dispatch_draw_line）：让前端在3D空间中绘制线段
 - 保存数据（save_data）：保存创建的对象到数据库
 
 重要规则：
@@ -39,8 +42,9 @@ const systemPrompt = `你是一个专业的3D建模助手。
 
 工作流程：
 1. 用户请求画线 → 调用 draw_line
-2. 画线成功 → 立即调用 save_data 保存
-3. 向用户报告结果
+2. 然后调用 dispatch_draw_line
+3. 画线成功 → 立即调用 save_data 保存
+4. 向用户报告结果
 
 对于无法完成的请求，请明确告诉用户：
 "抱歉，我无法完成[具体请求]。我只能帮您在3D空间中画线。请告诉我起点和终点坐标，或者起点、方向和距离。"`;
