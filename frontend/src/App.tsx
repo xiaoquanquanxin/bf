@@ -1,11 +1,38 @@
 import {FrontendAction} from './types';
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Scene3D} from './components/Scene3D';
 import {ChatPanel} from './components/ChatPanel';
+import {wsService} from './services/websocketService';
 import 'antd/dist/reset.css';
 import './App.css';
 
 function App() {
+  const scene3DRef = useRef<any>(null);
+  const wsInitialized = useRef(false);
+
+  useEffect(() => {
+    // 防止重复初始化
+    if (wsInitialized.current) {
+      return;
+    }
+    wsInitialized.current = true;
+
+    // 初始化 WebSocket 连接
+    wsService.connect().then(() => {
+      console.log('WebSocket 连接已建立');
+    }).catch(error => {
+      console.error('WebSocket 连接失败:', error);
+    });
+
+    // 监听画线消息
+    wsService.on('drawLine', (data: any) => {
+      console.log('收到画线消息:', data);
+      if (scene3DRef.current) {
+        scene3DRef.current.drawLine(data.startPoint, data.endPoint);
+      }
+    });
+  }, []);
+
   const handleFrontendAction = (action: FrontendAction) => {
     console.log('前端操作:', action);
 
