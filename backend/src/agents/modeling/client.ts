@@ -47,7 +47,7 @@ export class ModelingAgent {
 
       yield {type: 'end', data: {}};
     } catch (error) {
-      console.error('错误:', error);
+      console.error('❌ [Agent] 错误:', error);
       yield {type: 'error', data: {message: '执行失败'}};
     }
   }
