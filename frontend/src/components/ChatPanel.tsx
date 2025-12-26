@@ -56,6 +56,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
         userId,
         conversationId,
         (event) => {
+          console.log(event.data)
           switch (event.type) {
             case 'message':
               // 更新消息内容
