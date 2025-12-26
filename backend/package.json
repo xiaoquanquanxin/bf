@@ -9,14 +9,15 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "langchain": "1.2.2",
-    "@langchain/core": "1.1.7",
+    "@langchain/core": "1.1.8",
     "@langchain/langgraph": "1.0.7",
     "@langchain/openai": "1.2.0",
     "dotenv": "17.2.3",
     "express": "4.22.1",
+    "langchain": "1.2.3",
     "three": "0.158.0",
     "uuid": "9.0.1",
+    "ws": "8.18.3",
     "zod": "4.2.1"
   },
   "devDependencies": {
