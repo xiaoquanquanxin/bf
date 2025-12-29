@@ -32,7 +32,6 @@ function App() {
     wsService.on('drawLine', (data: any) => {
       console.log('收到画线消息:', data);
       console.log(scene3DRef.current)
-      debugger
       if (scene3DRef.current) {
         scene3DRef.current.drawLine(data.startPoint, data.endPoint);
       }
