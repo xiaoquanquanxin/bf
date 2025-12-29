@@ -6,10 +6,9 @@ import express from 'express'
 import { chatRouter } from './routers/chatRouter'
 // 导入 WebSocket
 import { createServer } from 'http'
+import { closeMCP } from './mcp-server'
 import { wsManager } from './utils/websocket'
 import { WebSocketServer } from 'ws'
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js'
-import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { myMCPdemo } from './agents/math'
 
 
@@ -104,14 +103,22 @@ wss.on('connection', (ws: any, req: any) => {
 // 启动服务器
 server.listen(PORT, async () => {
   // 输出服务器启动信息
-  console.log(`✅ 服务器启动: http://localhost:${PORT}`);
+  console.log(`✅ 服务器启动: http://localhost:${PORT}`)
   // 输出 API 接口信息
-  console.log(`📡 聊天接口: http://localhost:${PORT}/api/chat`);
-  console.log(`🔌 WebSocket: ws://localhost:${PORT}`);
-  console.log(`📊 当前连接的客户端数量: ${wsManager.getClientCount()}`);
+  console.log(`📡 聊天接口: http://localhost:${PORT}/api/chat`)
+  console.log(`🔌 WebSocket: ws://localhost:${PORT}`)
+  console.log(`📊 当前连接的客户端数量: ${wsManager.getClientCount()}`)
 }).on('error', (err: any) => {
-  console.error('服务器启动失败:', err);
-});
+  console.error('服务器启动失败:', err)
+})
 
+
+// 服务器关闭时
+process.on('SIGTERM', async () => {
+  console.log('Shutting down...')
+  server.close()
+  await closeMCP()  // ✅ 程序完全退出前关闭
+  console.log('✅ Clean shutdown')
+})
 
 myMCPdemo()
