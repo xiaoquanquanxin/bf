@@ -115,10 +115,10 @@ server.listen(PORT, async () => {
 
 // 服务器关闭时
 process.on('SIGTERM', async () => {
-  console.log('Shutting down...')
+  console.log('🔌 正在关闭...')
   server.close()
   await closeMCP()  // ✅ 程序完全退出前关闭
-  console.log('✅ Clean shutdown')
+  console.log('✅ 清理关闭完成')
 })
 
 myMCPdemo()

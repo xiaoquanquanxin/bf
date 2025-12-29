@@ -61,7 +61,7 @@ math_server.setRequestHandler(ListToolsRequestSchema, async () => {
 });
 
 math_server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  console.log(request.params.name)
+  console.log('🔍 调用工具:', request.params.name)
   switch (request.params.name) {
     case "add": {
       const { a, b } = request.params.arguments as { a: number; b: number };
@@ -93,7 +93,7 @@ math_server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function main() {
   const transport = new StdioServerTransport();
   await math_server.connect(transport);
-  console.error("Math MCP server running on stdio");
+  console.error("🧮 数学 MCP 服务器在 stdio 上运行");
 }
 
 main();

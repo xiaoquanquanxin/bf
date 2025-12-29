@@ -24,7 +24,7 @@ async function myMCPdemo() {
       messages: [{ role: 'user', content: 'What is 5 + 3?' }],
     })
     const lastMessage = response.messages[response.messages.length - 1]
-    console.log(lastMessage.content)
+    console.log('💬 MCP 计算结果:', lastMessage.content)
   } catch (error) {
     // console.error('Agent invoke error:', error)
   }
