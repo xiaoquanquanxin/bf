@@ -48,29 +48,28 @@ function parseAgentResponse(response: any, executionTime?: number): ParsedAgentR
 // 打印函数（可选，用于调试）
 function printParsedResponse(parsed: ParsedAgentResponse): void {
   console.log('\n' + '='.repeat(50))
-  console.log('📝 User Question:', parsed.userMessage)
+  console.log('📝 用户问题:', parsed.userMessage)
 
   if (parsed.toolCalls.length > 0) {
-    console.log('\n🔧 Tools Called:')
+    console.log('\n🔧 调用工具:')
     parsed.toolCalls.forEach(call => {
       console.log(`  - ${call.name}(${JSON.stringify(call.arguments)})`)
     })
   }
 
   if (parsed.toolResults.length > 0) {
-    console.log('\n📊 Tool Results:')
+    console.log('\n📊 工具结果:')
     parsed.toolResults.forEach(result => {
       console.log(`  - ${result.result}`)
     })
   }
 
-  console.log('\n💬 Final Answer:', parsed.finalAnswer)
+  console.log('\n💬 最终答案:', parsed.finalAnswer)
 
   if (parsed.metadata.executionTime) {
-    console.log(`\n⏱️  Execution time: ${parsed.metadata.executionTime}ms`)
+    console.log(`\n⏱️  执行时间: ${parsed.metadata.executionTime}ms`)
   }
   console.log('='.repeat(50) + '\n')
 }
-
 
 export { parseAgentResponse, printParsedResponse }
