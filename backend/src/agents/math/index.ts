@@ -18,7 +18,6 @@ async function myMCPdemo() {
     model,
     tools,
   })
-  await new Promise(resolve => setTimeout(resolve, 3000))
   try {
     const response = await agent.invoke({
       messages: [{ role: 'user', content: 'What is 5 + 3?' }],
