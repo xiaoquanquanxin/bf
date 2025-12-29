@@ -55,7 +55,7 @@ const closeMCP = async () => {
     // 如果客户端有 close 方法，调用它
     try {
       await mcp.client.close?.()
-  console.log('🔌 MCP 连接已关闭')
+      console.log('🔌 MCP 连接已关闭')
     } catch (error) {
       console.warn('⚠️ 关闭 MCP 客户端错误:', error)
     }
