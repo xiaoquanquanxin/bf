@@ -13,7 +13,7 @@ cp .env.example .env
 ```
 API_KEY=your_api_key_here
 BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
-MODEL_NAME=qwen-turbo
+MODEL_NAME=qwen-max
 PORT=8000
 ```
 
