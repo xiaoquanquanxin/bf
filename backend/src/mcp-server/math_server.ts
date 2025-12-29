@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
-const server = new Server(
+const math_server = new Server(
   {
     name: "math-server",
     version: "0.1.0",
@@ -17,7 +17,7 @@ const server = new Server(
   }
 );
 
-server.setRequestHandler(ListToolsRequestSchema, async () => {
+math_server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
@@ -60,7 +60,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   };
 });
 
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
+math_server.setRequestHandler(CallToolRequestSchema, async (request) => {
   switch (request.params.name) {
     case "add": {
       const { a, b } = request.params.arguments as { a: number; b: number };
@@ -91,7 +91,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 async function main() {
   const transport = new StdioServerTransport();
-  await server.connect(transport);
+  await math_server.connect(transport);
   console.error("Math MCP server running on stdio");
 }
 
