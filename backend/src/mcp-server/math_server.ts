@@ -61,6 +61,7 @@ math_server.setRequestHandler(ListToolsRequestSchema, async () => {
 });
 
 math_server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  console.log(request.params.name)
   switch (request.params.name) {
     case "add": {
       const { a, b } = request.params.arguments as { a: number; b: number };
