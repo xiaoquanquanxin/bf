@@ -24,20 +24,20 @@ const getMCP = async (): Promise<MCPInstance> => {
   }
 
   initPromise = (async () => {
-    console.log('📍 Initializing MCP...')
+    console.log('📍 初始化 MCP...')
 
     // 创建多服务器 MCP 客户端，连接到数学计算服务器
     const client = new MultiServerMCPClient({
       math: {
         transport: 'stdio',
         command: 'npx',
-        args: ['ts-node', resolve(__dirname, '../../mcp-server/math_server.ts')],
+        args: ['ts-node', resolve(__dirname, '../mcp-server/math_server.ts')],
       },
     })
 
     // 获取服务器提供的工具列表
     const tools = await client.getTools()
-    console.log(`✅ MCP ready with ${tools.length} tools`)
+    console.log(`✅ MCP 就绪，共 ${tools.length} 个工具`)
 
     mcp = { client, tools }
     return mcp
@@ -55,12 +55,12 @@ const closeMCP = async () => {
     // 如果客户端有 close 方法，调用它
     try {
       await mcp.client.close?.()
-      console.log('🔌 MCP connection closed')
+  console.log('🔌 MCP 连接已关闭')
     } catch (error) {
-      console.warn('⚠️ Error closing MCP client:', error)
+      console.warn('⚠️ 关闭 MCP 客户端错误:', error)
     }
   }
-  
+
   mcp = null
   initPromise = null
 }
