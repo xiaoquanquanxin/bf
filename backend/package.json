@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "prepare": "husky",
-    "mcp:math": "npx ts-node ./src/mcpServer/math_server.ts"
+    "mcp:math": "npx ts-node ./src/mcp-server/math_server.ts"
   },
    "lint-staged": {
     "*.{ts,js}": [
