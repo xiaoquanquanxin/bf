@@ -6,6 +6,8 @@ import { generateUUID } from 'three/src/math/MathUtils'
 import { drawLineSchema } from '../../../schemas'
 import { z } from 'zod'
 import { wsManager } from '../../../utils/websocket'
+import { sceneStorage } from '../../../utils/sceneStorage'
+import { toolContext } from '../../../utils/toolContext'
 
 // 定义工具返回结果的类型
 type LineResult = ToolResult<{
@@ -47,17 +49,32 @@ const drawAndDispatchLineTool = tool(
       timestamp: Date.now(),  // 时间戳
     }
 
+    // 获取当前会话信息
+    const { userId, conversationId } = toolContext.get('modeling');
 
-    // 通过 WebSocket 实时发送给所有连接的前端客户端
+    // 通过 WebSocket 发送给当前会话的所有客户端（会话隔离）
+    wsManager.broadcastToSession(userId, conversationId, lineData);
 
-    wsManager.broadcast(lineData)
+    // 生成对象 ID
+    const objectId = generateUUID();
 
+    // 自动添加到场景存储
+    sceneStorage.addObject(userId, conversationId, {
+      id: objectId,
+      type: 'line',
+      createdAt: Date.now(),
+      data: {
+        startPoint: { x: startPoint.x, y: startPoint.y, z: startPoint.z },
+        endPoint: { x: endPoint.x, y: endPoint.y, z: endPoint.z },
+        length
+      }
+    });
 
     // 返回工具执行结果（给 Agent 使用）
     return {
-      id: generateUUID(),
+      id: objectId,
       timestamp: Date.now(),
-      message: `已成功画线并发送给 ${wsManager.getClientCount()} 个客户端：从 (${startPoint.x.toFixed(2)}, ${startPoint.y.toFixed(2)}, ${startPoint.z.toFixed(2)}) 到 (${endPoint.x.toFixed(2)}, ${endPoint.y.toFixed(2)}, ${endPoint.z.toFixed(2)})，长度为 ${length.toFixed(2)} 单位`,
+      message: `已成功画线并发送给 ${wsManager.getClientCount()} 个客户端：从 (${startPoint.x.toFixed(2)}, ${startPoint.y.toFixed(2)}, ${startPoint.z.toFixed(2)}) 到 (${endPoint.x.toFixed(2)}, ${endPoint.y.toFixed(2)}, ${endPoint.z.toFixed(2)})，长度为 ${length.toFixed(2)} 单位。对象已自动添加到场景清单。`,
       success: true,
       data: {
         startPoint,  // 返回计算后的起点

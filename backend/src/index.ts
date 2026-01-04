@@ -9,8 +9,6 @@ import { createServer } from 'http'
 import { closeMCP } from './mcp-server'
 import { wsManager } from './utils/websocket'
 import { WebSocketServer } from 'ws'
-import { myMCPdemo } from './agents/math'
-
 
 // 创建 Express 应用
 const app = express()
@@ -53,29 +51,45 @@ const wss = new WebSocketServer({
 })
 
 wss.on('connection', (ws: any, req: any) => {
-  const clientIP = req.socket.remoteAddress
-  console.log(`🔌 WebSocket 客户端连接 - IP: ${clientIP}`)
-  wsManager.addClient(ws)
+  const clientIP = req.socket.remoteAddress;
+
+  // 解析 URL 参数
+  const url = new URL(req.url!, `http://${req.headers.host}`);
+  const userId = url.searchParams.get('userId');
+  const conversationId = url.searchParams.get('conversationId') || url.searchParams.get('projectId');
+
+  // 验证必需参数
+  if (!userId || !conversationId) {
+    console.log(`❌ WebSocket 连接被拒绝 - 缺少参数 (userId: ${userId}, conversationId: ${conversationId})`);
+    ws.close(1008, 'Missing userId or conversationId');
+    return;
+  }
+
+  console.log(`🔌 WebSocket 客户端连接 - IP: ${clientIP}, User: ${userId}, Conversation: ${conversationId}`);
+
+  // 添加客户端（带会话信息）
+  wsManager.addClient(ws, userId, conversationId);
 
   // 发送连接确认消息
   ws.send(JSON.stringify({
     type: 'connection',
     message: 'WebSocket 连接成功',
+    sessionId: `modeling_${userId}_${conversationId}`,
     timestamp: Date.now(),
-  }))
+  }));
 
   ws.on('message', (message: any) => {
-    console.log('📨 收到消息:', message.toString())
-  })
+    console.log(`📨 收到消息 [${userId}/${conversationId}]:`, message.toString());
+  });
 
   ws.on('close', (code: any, reason: any) => {
-    console.log(`❌ WebSocket 客户端断开 - Code: ${code}, Reason: ${reason}`)
-  })
+    console.log(`❌ WebSocket 客户端断开 [${userId}/${conversationId}] - Code: ${code}, Reason: ${reason}`);
+  });
 
   ws.on('error', (error: any) => {
-    console.error('❌ WebSocket 错误:', error)
-  })
-})
+    console.error(`❌ WebSocket 错误 [${userId}/${conversationId}]:`, error);
+  });
+});
 
 
 // const mcpServer = new Server(
@@ -121,4 +135,3 @@ process.on('SIGTERM', async () => {
   console.log('✅ 清理关闭完成')
 })
 
-myMCPdemo()

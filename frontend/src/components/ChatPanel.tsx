@@ -3,6 +3,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {AndroidOutlined, SendOutlined, UserOutlined} from '@ant-design/icons';
 import {Button, Card, Input, Space, Spin} from 'antd';
 import {chatService} from '../services/chatService';
+import {wsService} from '../services/websocketService';
 
 interface ChatPanelProps {
   onFrontendAction?: (action: FrontendAction) => void;
@@ -12,11 +13,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationId, setConversationId] = useState<string>('');
   const [options, setOptions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const userId = 'user-123'; // 固定用户ID
+  // 从 wsService 获取会话信息（确保和 WebSocket 使用相同的会话）
+  const sessionInfo = wsService.getSessionInfo();
+  const userId = sessionInfo.userId;
+  const conversationId = sessionInfo.conversationId;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
