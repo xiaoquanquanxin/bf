@@ -12,20 +12,27 @@ class WebSocketService {
    * 初始化会话信息
    */
   initialize(userId?: string, conversationId?: string) {
-    // 如果没有提供 userId，从 localStorage 获取或生成新的
-    this.userId = userId || localStorage.getItem('userId') || this.generateUserId();
+    // 如果没有提供 userId,先从 sessionStorage（tab独立）,再从 localStorage,最后生成新的
+    if (!userId) {
+      userId = sessionStorage.getItem('userId') ||
+               localStorage.getItem('userId') ||
+               this.generateUserId();
+    }
 
-    // 如果没有提供 conversationId，从 localStorage 获取或生成新的
-    this.conversationId = conversationId || localStorage.getItem('currentConversationId') || this.generateConversationId();
+    // conversationId 使用 sessionStorage（每个 tab 独立）
+    if (!conversationId) {
+      conversationId = sessionStorage.getItem('currentConversationId') ||
+                      this.generateConversationId();
+    }
 
-    // 保存到 localStorage
+    this.userId = userId;
+    this.conversationId = conversationId;
+
+    // userId 存到 localStorage（跨 tab 共享,代表同一用户）
     localStorage.setItem('userId', this.userId);
-    localStorage.setItem('currentConversationId', this.conversationId);
 
-    console.log('🔧 WebSocket 会话初始化:', {
-      userId: this.userId,
-      conversationId: this.conversationId
-    });
+    // conversationId 存到 sessionStorage（每个 tab 独立,代表不同项目）
+    sessionStorage.setItem('currentConversationId', this.conversationId);
   }
 
   /**
@@ -67,19 +74,15 @@ class WebSocketService {
     return new Promise((resolve, reject) => {
       // 构建带参数的 WebSocket URL
       const wsUrl = `${this.baseUrl}?userId=${this.userId}&conversationId=${this.conversationId}`;
-      console.log('🔌 连接 WebSocket:', wsUrl);
-
       globalWS = new WebSocket(wsUrl);
 
       globalWS.onopen = () => {
         isConnecting = false;
-        console.log('✅ WebSocket 连接成功');
         resolve();
       };
 
       globalWS.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log('📨 收到消息:', data);
         this.emit(data.type, data);
       };
 
@@ -90,7 +93,6 @@ class WebSocketService {
       };
 
       globalWS.onclose = (event) => {
-        console.log('🔌 WebSocket 断开:', event.code, event.reason);
         globalWS = null;
       };
     });

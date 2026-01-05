@@ -22,17 +22,12 @@ function App() {
     wsInitialized.current = true;
 
     // 初始化 WebSocket 连接（会自动生成或从 localStorage 加载会话信息）
-    wsService.connect().then(() => {
-      const sessionInfo = wsService.getSessionInfo();
-      console.log('✅ WebSocket 连接已建立，会话信息:', sessionInfo);
-    }).catch(error => {
+    wsService.connect().catch(error => {
       console.error('❌ WebSocket 连接失败:', error);
     });
 
     // 监听画线消息
     wsService.on('drawLine', (data: any) => {
-      console.log('📦 收到画线消息:', data);
-      console.log(scene3DRef.current)
       if (scene3DRef.current) {
         scene3DRef.current.drawLine(data.startPoint, data.endPoint);
       }
@@ -40,15 +35,11 @@ function App() {
   }, []);
 
   const handleFrontendAction = (action: FrontendAction) => {
-    console.log('前端操作:', action);
-
     switch (action.method) {
       case 'executeTask':
-        console.log('执行任务:', action.params.option);
         // 这里可以添加具体的 3D 操作逻辑
         break;
       case 'showOptions':
-        console.log('显示选项:', action.params.options);
         // 选项显示逻辑已在 ChatPanel 中处理
         break;
       default:

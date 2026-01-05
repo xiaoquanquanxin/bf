@@ -12,9 +12,7 @@ export class ModelingAgent {
     userId: string = "user_123",
     conversationId: string = "default"
   ): AsyncGenerator<StreamEvent> {
-    console.log('📨 [Modeling Agent] 收到消息:', messages);
-
-    // 设置工具上下文，供清单工具使用
+    // 设置工具上下文,供清单工具使用
     toolContext.set('modeling', userId, conversationId);
 
     const config = {
@@ -28,17 +26,10 @@ export class ModelingAgent {
     };
 
     try {
-      console.log('🚀 准备调用 modelingApp.stream...');
-      console.log('📋 Config:', config);
-      console.log('📋 InitialState:', initialState);
-
-      // 使用默认的流式模式（不指定 streamMode）
       const stream = await modelingApp.stream(initialState, config);
-      console.log('✅ Stream 创建成功:', stream);
 
       for await (const chunk of await stream) {
         const [nodeName, nodeOutput] = Object.entries(chunk)[0];
-        console.log(`🔄 [Node: ${nodeName}]`, nodeOutput);
 
         if (nodeName === 'model') {
           // 处理模型输出
@@ -55,7 +46,6 @@ export class ModelingAgent {
           for (const toolMsg of toolMessages) {
             try {
               const toolResult = JSON.parse(toolMsg.content);
-              console.log('🔧 [Tool Result]:', toolResult);
               yield {
                 type: 'tool',
                 data: toolResult

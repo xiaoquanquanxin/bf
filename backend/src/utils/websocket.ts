@@ -51,9 +51,7 @@ class WebSocketManager {
     // 添加到快速查找表
     this.wsToClient.set(ws, clientInfo);
 
-    console.log(`➕ 新客户端连接 [会话: ${sessionId}]`);
-    console.log(`   当前会话客户端数: ${this.sessions.get(sessionId)!.size}`);
-    console.log(`   全局客户端总数: ${this.wsToClient.size}`);
+    console.log(`➕ 客户端连接 [${sessionId}] (会话客户端: ${this.sessions.get(sessionId)!.size}, 总计: ${this.wsToClient.size})`);
 
     // 监听断开
     ws.on('close', () => {
@@ -61,7 +59,7 @@ class WebSocketManager {
     });
 
     ws.on('error', (error) => {
-      console.error('❌ 客户端 WebSocket 错误:', error);
+      console.error('❌ WebSocket 错误:', error);
       this.removeClient(ws);
     });
   }
@@ -83,16 +81,13 @@ class WebSocketManager {
       // 如果会话没有客户端了，删除会话
       if (sessionClients.size === 0) {
         this.sessions.delete(sessionId);
-        console.log(`🗑️  会话已清空，删除会话: ${sessionId}`);
       }
     }
 
     // 从快速查找表中移除
     this.wsToClient.delete(ws);
 
-    console.log(`➖ 客户端断开 [会话: ${sessionId}]`);
-    console.log(`   剩余会话客户端数: ${sessionClients?.size || 0}`);
-    console.log(`   全局客户端总数: ${this.wsToClient.size}`);
+    console.log(`➖ 客户端断开 [${sessionId}] (剩余: ${sessionClients?.size || 0})`);
   }
 
   /**
@@ -103,13 +98,11 @@ class WebSocketManager {
     const sessionClients = this.sessions.get(sessionId);
 
     if (!sessionClients || sessionClients.size === 0) {
-      console.log(`⚠️  会话 ${sessionId} 没有连接的客户端`);
       return;
     }
 
     const message = JSON.stringify(data);
     let successCount = 0;
-    let failCount = 0;
 
     sessionClients.forEach(clientInfo => {
       if (clientInfo.ws.readyState === WebSocket.OPEN) {
@@ -117,18 +110,13 @@ class WebSocketManager {
           clientInfo.ws.send(message);
           successCount++;
         } catch (error) {
-          console.error('❌ 发送消息失败:', error);
-          failCount++;
+          console.error('❌ 发送失败:', error);
           this.removeClient(clientInfo.ws);
         }
       } else {
-        // 清理已关闭的连接
         this.removeClient(clientInfo.ws);
-        failCount++;
       }
     });
-
-    console.log(`📤 广播消息到会话 [${sessionId}]: 成功 ${successCount} 个，失败 ${failCount} 个`);
   }
 
   /**
@@ -136,26 +124,19 @@ class WebSocketManager {
    */
   broadcast(data: any) {
     const message = JSON.stringify(data);
-    let successCount = 0;
-    let failCount = 0;
 
     this.wsToClient.forEach((clientInfo, ws) => {
       if (ws.readyState === WebSocket.OPEN) {
         try {
           ws.send(message);
-          successCount++;
         } catch (error) {
-          console.error('❌ 发送消息失败:', error);
-          failCount++;
+          console.error('❌ 广播失败:', error);
           this.removeClient(ws);
         }
       } else {
         this.removeClient(ws);
-        failCount++;
       }
     });
-
-    console.log(`📤 全局广播消息: 成功 ${successCount} 个，失败 ${failCount} 个`);
   }
 
   /**

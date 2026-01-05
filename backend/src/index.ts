@@ -51,8 +51,6 @@ const wss = new WebSocketServer({
 })
 
 wss.on('connection', (ws: any, req: any) => {
-  const clientIP = req.socket.remoteAddress;
-
   // 解析 URL 参数
   const url = new URL(req.url!, `http://${req.headers.host}`);
   const userId = url.searchParams.get('userId');
@@ -60,12 +58,10 @@ wss.on('connection', (ws: any, req: any) => {
 
   // 验证必需参数
   if (!userId || !conversationId) {
-    console.log(`❌ WebSocket 连接被拒绝 - 缺少参数 (userId: ${userId}, conversationId: ${conversationId})`);
+    console.log(`❌ WebSocket 连接被拒绝 - 缺少参数`);
     ws.close(1008, 'Missing userId or conversationId');
     return;
   }
-
-  console.log(`🔌 WebSocket 客户端连接 - IP: ${clientIP}, User: ${userId}, Conversation: ${conversationId}`);
 
   // 添加客户端（带会话信息）
   wsManager.addClient(ws, userId, conversationId);
@@ -77,18 +73,6 @@ wss.on('connection', (ws: any, req: any) => {
     sessionId: `modeling_${userId}_${conversationId}`,
     timestamp: Date.now(),
   }));
-
-  ws.on('message', (message: any) => {
-    console.log(`📨 收到消息 [${userId}/${conversationId}]:`, message.toString());
-  });
-
-  ws.on('close', (code: any, reason: any) => {
-    console.log(`❌ WebSocket 客户端断开 [${userId}/${conversationId}] - Code: ${code}, Reason: ${reason}`);
-  });
-
-  ws.on('error', (error: any) => {
-    console.error(`❌ WebSocket 错误 [${userId}/${conversationId}]:`, error);
-  });
 });
 
 

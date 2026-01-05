@@ -59,7 +59,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
         userId,
         conversationId,
         (event) => {
-          console.log(event.data)
           switch (event.type) {
             case 'message':
               // 更新消息内容
@@ -90,7 +89,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
               });
               break;
             case 'end':
-              console.log('流结束');
               setIsLoading(false);
               break;
             case 'error':
@@ -101,7 +99,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
                 if (newMessages[lastIndex]?.role === 'assistant') {
                   newMessages[lastIndex] = {
                     ...newMessages[lastIndex],
-                    content: '抱歉，处理消息时出现错误。'
+                    content: '抱歉,处理消息时出现错误。'
                   };
                 }
                 return newMessages;
@@ -120,7 +118,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({onFrontendAction}) => {
         if (newMessages[lastIndex]?.role === 'assistant') {
           newMessages[lastIndex] = {
             ...newMessages[lastIndex],
-            content: '抱歉，发送消息时出现错误。请稍后重试。'
+            content: '抱歉,发送消息时出现错误。请稍后重试。'
           };
         }
         return newMessages;
